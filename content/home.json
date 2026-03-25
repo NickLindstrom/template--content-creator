@@ -1,0 +1,121 @@
+{
+  "site": {
+    "siteId": "00000000-0000-0000-0000-000000000000",
+    "language": "sv",
+    "industry": "electrician"
+  },
+  "brand": {
+    "companyName": "Exempel Elservice AB",
+    "tagline": "Trygga elinstallationer för hem och företag"
+  },
+  "seo": {
+    "title": "Exempel Elservice i Stockholm | Elektriker för hem och företag",
+    "description": "Exempel Elservice hjälper privatpersoner och företag med elinstallationer, felsökning och laddboxar i Stockholm med omnejd.",
+    "canonicalUrl": "https://www.exempel.se/",
+    "ogImage": "https://www.exempel.se/assets/og-default.svg"
+  },
+  "hero": {
+    "eyebrow": "Elektriker i Stockholm",
+    "title": "Trygg hjälp med elinstallationer och service",
+    "text": "Vi hjälper privatpersoner och företag med säkra, smidiga och professionella ellösningar.",
+    "primaryCtaLabel": "Begär offert",
+    "primaryCtaHref": "#contact",
+    "secondaryCtaLabel": "Ring oss",
+    "secondaryCtaHref": "tel:0701234567"
+  },
+  "intro": {
+    "title": "Din lokala expert",
+    "text": "Vi erbjuder snabb återkoppling, tydliga priser och väl utförda arbeten för både små och stora uppdrag."
+  },
+  "services": {
+    "title": "Våra tjänster",
+    "items": [
+      {
+        "id": "service-1",
+        "title": "Elinstallationer",
+        "text": "Installation av belysning, eluttag, centraler och fasta elarbeten."
+      },
+      {
+        "id": "service-2",
+        "title": "Felsökning",
+        "text": "Snabb felsökning och åtgärd vid akuta eller återkommande elproblem."
+      },
+      {
+        "id": "service-3",
+        "title": "Laddboxar",
+        "text": "Installation och rådgivning kring laddboxar för villa och företag."
+      }
+    ]
+  },
+  "about": {
+    "title": "Om oss",
+    "text": "Exempel Elservice är ett erfaret företag som sätter säkerhet, tydlighet och god service i första rummet. Vårt mål är att göra det enkelt att få rätt hjälp direkt."
+  },
+  "usp": {
+    "title": "Därför väljer kunder oss",
+    "items": [
+      {
+        "id": "usp-1",
+        "label": "Snabb återkoppling"
+      },
+      {
+        "id": "usp-2",
+        "label": "Certifierad kompetens"
+      },
+      {
+        "id": "usp-3",
+        "label": "Tydliga priser"
+      }
+    ]
+  },
+  "testimonials": {
+    "enabled": true,
+    "title": "Vad kunder säger",
+    "items": [
+      {
+        "id": "testimonial-1",
+        "name": "Anna",
+        "text": "Snabb hjälp och väldigt proffsigt bemötande."
+      },
+      {
+        "id": "testimonial-2",
+        "name": "Johan",
+        "text": "Tydlig offert, bra kommunikation och snyggt utfört arbete."
+      }
+    ]
+  },
+  "faq": {
+    "enabled": true,
+    "title": "Vanliga frågor",
+    "items": [
+      {
+        "id": "faq-1",
+        "question": "Vilka områden arbetar ni i?",
+        "answer": "Vi arbetar främst i Stockholm med omnejd."
+      },
+      {
+        "id": "faq-2",
+        "question": "Kan jag få offert innan arbete påbörjas?",
+        "answer": "Ja, vi erbjuder tydliga offerter innan vi sätter igång."
+      }
+    ]
+  },
+  "contact": {
+    "title": "Kontakta oss",
+    "text": "Hör av dig så återkommer vi så snart vi kan.",
+    "phone": "0701234567",
+    "email": "kontakt@exempel.se",
+    "address": "Exempelgatan 1, 111 22 Stockholm",
+    "openingHours": "Mån-Fre 08:00-17:00"
+  },
+  "footer": {
+    "companyName": "Exempel Elservice AB",
+    "orgNumber": "559000-0000",
+    "text": "Professionella elarbeten för privatpersoner och företag.",
+    "socialLinks": {
+      "facebook": "",
+      "instagram": "",
+      "linkedin": ""
+    }
+  }
+}

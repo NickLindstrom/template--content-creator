@@ -1,0 +1,9 @@
+{
+  "name": "onepager-site-template",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static one-page website template with build-time content injection for GitHub Pages.",
+  "scripts": {
+    "build": "node scripts/build.js"
+  }
+}
