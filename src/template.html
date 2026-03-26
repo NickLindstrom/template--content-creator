@@ -5,13 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{seo.title}}</title>
     <meta name="description" content="{{seo.description}}">
-    <link rel="canonical" href="{{seo.canonicalUrl}}">
 
     <meta property="og:type" content="website">
     <meta property="og:locale" content="{{og.locale}}">
     <meta property="og:title" content="{{seo.title}}">
     <meta property="og:description" content="{{seo.description}}">
-    <meta property="og:url" content="{{seo.canonicalUrl}}">
     <meta property="og:image" content="{{seo.ogImage}}">
 
     <meta name="twitter:card" content="summary_large_image">
@@ -23,19 +21,19 @@
     <script defer src="index.js"></script>
   </head>
   <body class="site-body">
-    <a class="skip-link" href="#main-content">Hoppa till innehåll</a>
+    <a class="skip-link" href="#main-content">Hoppa till innehall</a>
 
     <header class="site-header">
       <div class="site-container header-inner">
-        <a class="brand-mark" href="#top" aria-label="Till startsidan">{{brand.companyName}}</a>
+        {{headerBrand}}
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-navigation">
           Meny
         </button>
         <nav id="site-navigation" class="site-navigation" aria-label="Huvudmeny">
-          <a class="site-navigation__link" href="#services">Tjänster</a>
+          <a class="site-navigation__link" href="#services">Tjanster</a>
           <a class="site-navigation__link" href="#about">Om oss</a>
-          <a class="site-navigation__link" href="#faq">FAQ</a>
-          <a class="site-navigation__link site-navigation__link--cta" href="#contact">Kontakt</a>
+          <a class="site-navigation__link" href="#gallery">Bilder</a>
+          <a class="site-navigation__link site-navigation__link--cta" href="{{hero.primaryCtaHref}}">{{hero.primaryCtaLabel}}</a>
         </nav>
       </div>
     </header>
@@ -45,35 +43,38 @@
         <div class="site-container hero-layout">
           <div class="hero-content">
             <p class="section-eyebrow">{{hero.eyebrow}}</p>
-            <h1 class="hero-title">{{hero.title}}</h1>
-            <p class="hero-text">{{hero.text}}</p>
+            <h1 class="hero-title">{{hero.headline}}</h1>
+            <p class="hero-text">{{hero.subheadline}}</p>
             <div class="hero-actions">
               <a class="button button--primary" href="{{hero.primaryCtaHref}}">{{hero.primaryCtaLabel}}</a>
-              <a class="button button--secondary" href="{{hero.secondaryCtaHref}}">{{hero.secondaryCtaLabel}}</a>
+              <a class="button button--secondary" href="#services">Utforska tjanster</a>
             </div>
           </div>
-          <aside class="hero-aside-card">
-            <p class="hero-aside-card__label">{{brand.companyName}}</p>
-            <h2 class="hero-aside-card__title">{{brand.tagline}}</h2>
-            <ul class="hero-aside-card__list">
-              {{uspList}}
-            </ul>
-          </aside>
+          <div class="hero-visual">
+            <div class="hero-visual__main-card">
+              <img class="hero-visual__image" src="{{media.heroImage.url}}" alt="{{media.heroImage.alt}}">
+            </div>
+            <div class="hero-visual__floating-card">
+              <p class="hero-visual__label">Lokalt fokus</p>
+              <p class="hero-visual__value">{{site.displayName}}</p>
+              <p class="hero-visual__caption">{{contact.address}}</p>
+            </div>
+          </div>
         </div>
       </section>
 
       <section class="intro-section section-spacing">
         <div class="site-container narrow-container">
-          <p class="section-eyebrow">Om verksamheten</p>
-          <h2 class="section-title">{{intro.title}}</h2>
-          <p class="section-text">{{intro.text}}</p>
+          <p class="section-eyebrow">Introduktion</p>
+          <h2 class="section-title">{{intro.heading}}</h2>
+          <p class="section-text">{{intro.body}}</p>
         </div>
       </section>
 
       <section id="services" class="services-section section-spacing section-surface">
         <div class="site-container">
-          <p class="section-eyebrow">Tjänster</p>
-          <h2 class="section-title">{{services.title}}</h2>
+          <p class="section-eyebrow">Tjanster</p>
+          <h2 class="section-title">{{services.heading}}</h2>
           <div class="services-grid">
             {{servicesList}}
           </div>
@@ -84,18 +85,24 @@
         <div class="site-container about-layout">
           <div class="about-content">
             <p class="section-eyebrow">Om oss</p>
-            <h2 class="section-title">{{about.title}}</h2>
-            <p class="section-text">{{about.text}}</p>
+            <h2 class="section-title">{{about.heading}}</h2>
+            <p class="section-text">{{about.body}}</p>
           </div>
-          <div class="highlight-panel">
-            <p class="highlight-panel__label">Därför väljer kunder oss</p>
-            <ul class="usp-list">
-              {{uspList}}
-            </ul>
+          <div class="about-media">
+            <div class="about-media__image-frame">
+              <img class="about-media__image" src="{{media.aboutImage.url}}" alt="{{media.aboutImage.alt}}">
+            </div>
+            <div class="highlight-panel">
+              <p class="highlight-panel__label">{{usp.heading}}</p>
+              <ul class="usp-list">
+                {{uspList}}
+              </ul>
+            </div>
           </div>
         </div>
       </section>
 
+      {{gallerySection}}
       {{testimonialsSection}}
       {{faqSection}}
 
@@ -103,8 +110,8 @@
         <div class="site-container contact-layout">
           <div class="contact-content">
             <p class="section-eyebrow">Kontakt</p>
-            <h2 class="section-title">{{contact.title}}</h2>
-            <p class="section-text">{{contact.text}}</p>
+            <h2 class="section-title">{{contact.heading}}</h2>
+            <p class="section-text">{{contact.body}}</p>
           </div>
           <div class="contact-card">
             <div class="contact-card__row">
@@ -119,10 +126,6 @@
               <span class="contact-card__label">Adress</span>
               <span class="contact-card__value">{{contact.address}}</span>
             </div>
-            <div class="contact-card__row">
-              <span class="contact-card__label">Öppettider</span>
-              <span class="contact-card__value">{{contact.openingHours}}</span>
-            </div>
           </div>
         </div>
       </section>
@@ -130,17 +133,16 @@
 
     <footer class="site-footer">
       <div class="site-container footer-layout">
-        <div>
-          <p class="site-footer__company">{{footer.companyName}}</p>
-          <p class="site-footer__text">{{footer.text}}</p>
-          <p class="site-footer__meta">Org.nr {{footer.orgNumber}}</p>
+        <div class="site-footer__brand">
+          {{footerBrand}}
+          <p class="site-footer__text">{{footer.tagline}}</p>
         </div>
         <div class="site-footer__links">
           {{socialLinks}}
         </div>
       </div>
       <div class="site-container footer-bottom-row">
-        <p class="footer-bottom-row__copyright">© <span id="current-year"></span> {{footer.companyName}}</p>
+        <p class="footer-bottom-row__copyright">{{footer.copyright}}</p>
       </div>
     </footer>
   </body>

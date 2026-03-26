@@ -1,121 +1,129 @@
 {
   "site": {
     "siteId": "00000000-0000-0000-0000-000000000000",
-    "language": "sv",
-    "industry": "electrician"
-  },
-  "brand": {
     "companyName": "Exempel Elservice AB",
-    "tagline": "Trygga elinstallationer för hem och företag"
+    "displayName": "Exempel Elservice",
+    "language": "sv",
+    "primaryColor": "#1254c5",
+    "secondaryColor": "#172033"
   },
   "seo": {
-    "title": "Exempel Elservice i Stockholm | Elektriker för hem och företag",
-    "description": "Exempel Elservice hjälper privatpersoner och företag med elinstallationer, felsökning och laddboxar i Stockholm med omnejd.",
-    "canonicalUrl": "https://www.exempel.se/",
-    "ogImage": "https://www.exempel.se/assets/og-default.svg"
+    "title": "Exempel Elservice i Stockholm | Elektriker for hem och foretag",
+    "description": "Exempel Elservice hjalper privatpersoner och foretag med elinstallationer, felsokning och laddboxar i Stockholm med omnejd.",
+    "keywords": [
+      "elektriker stockholm",
+      "laddbox",
+      "elinstallation"
+    ]
   },
   "hero": {
     "eyebrow": "Elektriker i Stockholm",
-    "title": "Trygg hjälp med elinstallationer och service",
-    "text": "Vi hjälper privatpersoner och företag med säkra, smidiga och professionella ellösningar.",
-    "primaryCtaLabel": "Begär offert",
-    "primaryCtaHref": "#contact",
-    "secondaryCtaLabel": "Ring oss",
-    "secondaryCtaHref": "tel:0701234567"
+    "headline": "Trygg hjalp med elinstallationer och service",
+    "subheadline": "Vi hjalper privatpersoner och foretag med sakra, smidiga och professionella ellosningar i Stockholm.",
+    "primaryCtaLabel": "Begar offert",
+    "primaryCtaHref": "#contact"
   },
   "intro": {
-    "title": "Din lokala expert",
-    "text": "Vi erbjuder snabb återkoppling, tydliga priser och väl utförda arbeten för både små och stora uppdrag."
+    "heading": "Din lokala expert",
+    "body": "Vi erbjuder snabb aterkoppling, tydliga priser och val utforta arbeten for bade sma och stora uppdrag."
   },
   "services": {
-    "title": "Våra tjänster",
+    "heading": "Vara tjanster",
     "items": [
       {
-        "id": "service-1",
         "title": "Elinstallationer",
-        "text": "Installation av belysning, eluttag, centraler och fasta elarbeten."
+        "description": "Installation av belysning, eluttag, centraler och fasta elarbeten."
       },
       {
-        "id": "service-2",
-        "title": "Felsökning",
-        "text": "Snabb felsökning och åtgärd vid akuta eller återkommande elproblem."
+        "title": "Felsokning",
+        "description": "Snabb felsokning och atgard vid akuta eller aterkommande elproblem."
       },
       {
-        "id": "service-3",
         "title": "Laddboxar",
-        "text": "Installation och rådgivning kring laddboxar för villa och företag."
+        "description": "Installation och radgivning kring laddboxar for villa och foretag."
       }
     ]
   },
   "about": {
-    "title": "Om oss",
-    "text": "Exempel Elservice är ett erfaret företag som sätter säkerhet, tydlighet och god service i första rummet. Vårt mål är att göra det enkelt att få rätt hjälp direkt."
+    "heading": "Om oss",
+    "body": "Exempel Elservice ar ett erfaret foretag som satter sakerhet, tydlighet och god service i forsta rummet. Vart mal ar att gora det enkelt att fa ratt hjalp direkt."
   },
   "usp": {
-    "title": "Därför väljer kunder oss",
+    "heading": "Darfor valjer kunder oss",
     "items": [
-      {
-        "id": "usp-1",
-        "label": "Snabb återkoppling"
-      },
-      {
-        "id": "usp-2",
-        "label": "Certifierad kompetens"
-      },
-      {
-        "id": "usp-3",
-        "label": "Tydliga priser"
-      }
+      "Snabb aterkoppling",
+      "Certifierad kompetens",
+      "Tydliga priser"
     ]
   },
   "testimonials": {
+    "heading": "Vad kunder sager",
     "enabled": true,
-    "title": "Vad kunder säger",
     "items": [
       {
-        "id": "testimonial-1",
         "name": "Anna",
-        "text": "Snabb hjälp och väldigt proffsigt bemötande."
+        "quote": "Snabb hjalp och valdigt proffsigt bemotande."
       },
       {
-        "id": "testimonial-2",
         "name": "Johan",
-        "text": "Tydlig offert, bra kommunikation och snyggt utfört arbete."
+        "quote": "Tydlig offert, bra kommunikation och snyggt utfort arbete."
       }
     ]
   },
   "faq": {
+    "heading": "Vanliga fragor",
     "enabled": true,
-    "title": "Vanliga frågor",
     "items": [
       {
-        "id": "faq-1",
-        "question": "Vilka områden arbetar ni i?",
-        "answer": "Vi arbetar främst i Stockholm med omnejd."
+        "question": "Vilka omraden arbetar ni i?",
+        "answer": "Vi arbetar framst i Stockholm med omnejd."
       },
       {
-        "id": "faq-2",
-        "question": "Kan jag få offert innan arbete påbörjas?",
-        "answer": "Ja, vi erbjuder tydliga offerter innan vi sätter igång."
+        "question": "Kan jag fa offert innan arbete paborjas?",
+        "answer": "Ja, vi erbjuder tydliga offerter innan vi satter igang."
       }
     ]
   },
   "contact": {
-    "title": "Kontakta oss",
-    "text": "Hör av dig så återkommer vi så snart vi kan.",
+    "heading": "Kontakta oss",
+    "body": "Hor av dig sa aterkommer vi sa snart vi kan.",
     "phone": "0701234567",
     "email": "kontakt@exempel.se",
-    "address": "Exempelgatan 1, 111 22 Stockholm",
-    "openingHours": "Mån-Fre 08:00-17:00"
+    "address": "Exempelgatan 1, 111 22 Stockholm"
   },
   "footer": {
     "companyName": "Exempel Elservice AB",
-    "orgNumber": "559000-0000",
-    "text": "Professionella elarbeten för privatpersoner och företag.",
+    "tagline": "Professionella elarbeten for privatpersoner och foretag.",
+    "copyright": "� 2026 Exempel Elservice AB",
     "socialLinks": {
       "facebook": "",
       "instagram": "",
       "linkedin": ""
     }
+  },
+  "media": {
+    "logoUrl": "assets/logo-mark.svg",
+    "heroImage": {
+      "url": "assets/hero-illustration.svg",
+      "alt": "Illustration av modern verksamhet"
+    },
+    "aboutImage": {
+      "url": "assets/about-illustration.svg",
+      "alt": "Illustration av arbetssituation"
+    },
+    "gallery": [
+      {
+        "url": "assets/hero-illustration.svg",
+        "alt": "Hero-bild for verksamheten"
+      },
+      {
+        "url": "assets/about-illustration.svg",
+        "alt": "Verksamhetsbild for om-sektionen"
+      },
+      {
+        "url": "assets/detail-pattern.svg",
+        "alt": "Detaljbild med grafiskt monster"
+      }
+    ]
   }
 }
