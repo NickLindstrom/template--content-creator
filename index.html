@@ -1,23 +1,23 @@
 <!doctype html>
 <html lang="sv">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Exempel Elservice i Stockholm | Elektriker for hem och foretag</title>
-    <meta name="description" content="Exempel Elservice hjalper privatpersoner och foretag med elinstallationer, felsokning och laddboxar i Stockholm med omnejd.">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Loading...</title>
+    <meta name="description" content="" />
 
-    <meta property="og:type" content="website">
-    <meta property="og:locale" content="sv_SE">
-    <meta property="og:title" content="Exempel Elservice i Stockholm | Elektriker for hem och foretag">
-    <meta property="og:description" content="Exempel Elservice hjalper privatpersoner och foretag med elinstallationer, felsokning och laddboxar i Stockholm med omnejd.">
-    <meta property="og:image" content="">
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="sv_SE" />
+    <meta property="og:title" content="" />
+    <meta property="og:description" content="" />
+    <meta property="og:image" content="" />
 
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Exempel Elservice i Stockholm | Elektriker for hem och foretag">
-    <meta name="twitter:description" content="Exempel Elservice hjalper privatpersoner och foretag med elinstallationer, felsokning och laddboxar i Stockholm med omnejd.">
-    <meta name="twitter:image" content="">
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="" />
+    <meta name="twitter:description" content="" />
+    <meta name="twitter:image" content="" />
 
-    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="main.css" />
     <script defer src="index.js"></script>
   </head>
   <body class="site-body">
@@ -25,15 +25,42 @@
 
     <header class="site-header">
       <div class="site-container header-inner">
-        <a class="brand-mark" href="#top" aria-label="Till startsidan"><span class="brand-mark__text">Exempel Elservice</span></a>
-        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-navigation">
+        <a
+          id="header-brand"
+          class="brand-mark"
+          href="#top"
+          aria-label="Till startsidan"
+        >
+          <span class="brand-mark__text">Laddar...</span>
+        </a>
+        <button
+          class="nav-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="site-navigation"
+        >
           Meny
         </button>
-        <nav id="site-navigation" class="site-navigation" aria-label="Huvudmeny">
+        <nav
+          id="site-navigation"
+          class="site-navigation"
+          aria-label="Huvudmeny"
+        >
           <a class="site-navigation__link" href="#services">Tjanster</a>
           <a class="site-navigation__link" href="#about">Om oss</a>
-          
-          <a class="site-navigation__link site-navigation__link--cta" href="#contact">Begar offert</a>
+          <a
+            id="gallery-nav-link"
+            class="site-navigation__link"
+            href="#gallery"
+            hidden
+            >Bilder</a
+          >
+          <a
+            id="nav-cta-link"
+            class="site-navigation__link site-navigation__link--cta"
+            href="#contact"
+            >Kontakt</a
+          >
         </nav>
       </div>
     </header>
@@ -42,57 +69,41 @@
       <section id="top" class="hero-section">
         <div class="site-container hero-layout">
           <div class="hero-content">
-            <p class="section-eyebrow">Elektriker i Stockholm</p>
-            <h1 class="hero-title">Trygg hjalp med elinstallationer och service</h1>
-            <p class="hero-text">Vi hjalper privatpersoner och foretag med sakra, smidiga och professionella ellosningar i Stockholm.</p>
+            <p id="hero-eyebrow" class="section-eyebrow"></p>
+            <h1 id="hero-headline" class="hero-title"></h1>
+            <p id="hero-subheadline" class="hero-text"></p>
             <div class="hero-actions">
-              <a class="button button--primary" href="#contact">Begar offert</a>
-              <a class="button button--secondary" href="#services">Utforska tjanster</a>
+              <a
+                id="hero-primary-cta"
+                class="button button--primary"
+                href="#contact"
+                >Kontakta oss</a
+              >
+              <a class="button button--secondary" href="#services"
+                >Utforska tjanster</a
+              >
             </div>
           </div>
-          
+          <div id="hero-visual-slot"></div>
         </div>
       </section>
 
       <section class="intro-section section-spacing">
         <div class="site-container narrow-container">
           <p class="section-eyebrow">Introduktion</p>
-          <h2 class="section-title">Din lokala expert</h2>
-          <p class="section-text">Vi erbjuder snabb aterkoppling, tydliga priser och val utforta arbeten for bade sma och stora uppdrag.</p>
+          <h2 id="intro-heading" class="section-title"></h2>
+          <p id="intro-body" class="section-text"></p>
         </div>
       </section>
 
-      <section id="services" class="services-section section-spacing section-surface">
+      <section
+        id="services"
+        class="services-section section-spacing section-surface"
+      >
         <div class="site-container">
           <p class="section-eyebrow">Tjanster</p>
-          <h2 class="section-title">Vara tjanster</h2>
-          <div class="services-grid">
-            
-    <article class="service-card">
-      <div class="service-card__media">
-        <span class="service-card__badge">Tjanst</span>
-      </div>
-      <h3 class="service-card__title">Elinstallationer</h3>
-      <p class="service-card__text">Installation av belysning, eluttag, centraler och fasta elarbeten.</p>
-    </article>
-  
-    <article class="service-card">
-      <div class="service-card__media">
-        <span class="service-card__badge">Tjanst</span>
-      </div>
-      <h3 class="service-card__title">Felsokning</h3>
-      <p class="service-card__text">Snabb felsokning och atgard vid akuta eller aterkommande elproblem.</p>
-    </article>
-  
-    <article class="service-card">
-      <div class="service-card__media">
-        <span class="service-card__badge">Tjanst</span>
-      </div>
-      <h3 class="service-card__title">Laddboxar</h3>
-      <p class="service-card__text">Installation och radgivning kring laddboxar for villa och foretag.</p>
-    </article>
-  
-          </div>
+          <h2 id="services-heading" class="section-title"></h2>
+          <div id="services-list" class="services-grid"></div>
         </div>
       </section>
 
@@ -100,82 +111,63 @@
         <div class="site-container about-layout">
           <div class="about-content">
             <p class="section-eyebrow">Om oss</p>
-            <h2 class="section-title">Om oss</h2>
-            <p class="section-text">Exempel Elservice ar ett erfaret foretag som satter sakerhet, tydlighet och god service i forsta rummet. Vart mal ar att gora det enkelt att fa ratt hjalp direkt.</p>
+            <h2 id="about-heading" class="section-title"></h2>
+            <p id="about-body" class="section-text"></p>
           </div>
-          
-    <div class="about-media">
-      
-      <div class="highlight-panel">
-        <p class="highlight-panel__label">Darfor valjer kunder oss</p>
-        <ul class="usp-list">
-          <li class="usp-list__item">Snabb aterkoppling</li><li class="usp-list__item">Certifierad kompetens</li><li class="usp-list__item">Tydliga priser</li>
-        </ul>
-      </div>
-    </div>
-  
+          <div id="about-visual-slot"></div>
         </div>
       </section>
 
-      
-      
-    <section class="testimonials-section section-spacing">
-      <div class="site-container">
-        <p class="section-eyebrow">Omdomen</p>
-        <h2 class="section-title">Vad kunder sager</h2>
-        <div class="testimonials-grid">
-    <article class="testimonial-card">
-      <h3 class="testimonial-card__name">Anna</h3>
-      <p class="testimonial-card__text">"Snabb hjalp och valdigt proffsigt bemotande."</p>
-    </article>
-  
-    <article class="testimonial-card">
-      <h3 class="testimonial-card__name">Johan</h3>
-      <p class="testimonial-card__text">"Tydlig offert, bra kommunikation och snyggt utfort arbete."</p>
-    </article>
-  </div>
-      </div>
-    </section>
-  
-      
-    <section id="faq" class="faq-section section-spacing">
-      <div class="site-container">
-        <p class="section-eyebrow">FAQ</p>
-        <h2 class="section-title">Vanliga fragor</h2>
-        <div class="faq-list">
-    <article class="faq-item">
-      <h3 class="faq-item__question">Vilka omraden arbetar ni i?</h3>
-      <p class="faq-item__answer">Vi arbetar framst i Stockholm med omnejd.</p>
-    </article>
-  
-    <article class="faq-item">
-      <h3 class="faq-item__question">Kan jag fa offert innan arbete paborjas?</h3>
-      <p class="faq-item__answer">Ja, vi erbjuder tydliga offerter innan vi satter igang.</p>
-    </article>
-  </div>
-      </div>
-    </section>
-  
+      <section id="gallery" class="gallery-section section-spacing" hidden>
+        <div class="site-container">
+          <p class="section-eyebrow">Bilder</p>
+          <h2 class="section-title">Inblick i verksamheten</h2>
+          <div id="gallery-grid" class="gallery-grid"></div>
+        </div>
+      </section>
 
-      <section id="contact" class="contact-section section-spacing section-surface">
+      <section
+        id="testimonials-section"
+        class="testimonials-section section-spacing"
+        hidden
+      >
+        <div class="site-container">
+          <p class="section-eyebrow">Omdomen</p>
+          <h2 id="testimonials-heading" class="section-title"></h2>
+          <div id="testimonials-list" class="testimonials-grid"></div>
+        </div>
+      </section>
+
+      <section id="faq" class="faq-section section-spacing" hidden>
+        <div class="site-container">
+          <p class="section-eyebrow">FAQ</p>
+          <h2 id="faq-heading" class="section-title"></h2>
+          <div id="faq-list" class="faq-list"></div>
+        </div>
+      </section>
+
+      <section
+        id="contact"
+        class="contact-section section-spacing section-surface"
+      >
         <div class="site-container contact-layout">
           <div class="contact-content">
             <p class="section-eyebrow">Kontakt</p>
-            <h2 class="section-title">Kontakta oss</h2>
-            <p class="section-text">Hor av dig sa aterkommer vi sa snart vi kan.</p>
+            <h2 id="contact-heading" class="section-title"></h2>
+            <p id="contact-body" class="section-text"></p>
           </div>
           <div class="contact-card">
             <div class="contact-card__row">
               <span class="contact-card__label">Telefon</span>
-              <a class="contact-card__value" href="tel:0701234567">0701234567</a>
+              <a id="contact-phone" class="contact-card__value" href="#"></a>
             </div>
             <div class="contact-card__row">
               <span class="contact-card__label">E-post</span>
-              <a class="contact-card__value" href="mailto:kontakt@exempel.se">kontakt@exempel.se</a>
+              <a id="contact-email" class="contact-card__value" href="#"></a>
             </div>
             <div class="contact-card__row">
               <span class="contact-card__label">Adress</span>
-              <span class="contact-card__value">Exempelgatan 1, 111 22 Stockholm</span>
+              <span id="contact-address" class="contact-card__value"></span>
             </div>
           </div>
         </div>
@@ -185,16 +177,164 @@
     <footer class="site-footer">
       <div class="site-container footer-layout">
         <div class="site-footer__brand">
-          <a class="brand-mark brand-mark--footer" href="#top" aria-label="Till startsidan"><span class="brand-mark__text">Exempel Elservice AB</span></a>
-          <p class="site-footer__text">Professionella elarbeten for privatpersoner och foretag.</p>
+          <a
+            id="footer-brand"
+            class="brand-mark brand-mark--footer"
+            href="#top"
+            aria-label="Till startsidan"
+          >
+            <span class="brand-mark__text">Laddar...</span>
+          </a>
+          <p id="footer-tagline" class="site-footer__text"></p>
         </div>
-        <div class="site-footer__links">
-          <span class="site-footer__meta">Inga sociala lankar angivna.</span>
-        </div>
+        <div id="social-links" class="site-footer__links"></div>
       </div>
       <div class="site-container footer-bottom-row">
-        <p class="footer-bottom-row__copyright">� 2026 Exempel Elservice AB</p>
+        <p id="footer-copyright" class="footer-bottom-row__copyright"></p>
       </div>
     </footer>
+    <script id="initial-content" type="application/json">
+      {
+        "site": {
+          "siteId": "9ef77944-e83d-43d2-9528-cb4355a6af48",
+          "companyName": "MAWA Reklam",
+          "displayName": "MAWA Reklam",
+          "language": "sv",
+          "primaryColor": "#2eacf0",
+          "secondaryColor": "#ff19ac"
+        },
+        "seo": {
+          "title": "MAWA Reklam | Fordonsdekor, skyltar och digitaltryck i Sundsvall",
+          "description": "MAWA Reklam är ett digitaltryckeri i Sundsvall som designar, producerar och monterar fordonsdekor, butiksdekor, skyltar, dekaler, flaggor, vepor och trycksaker för kunder i hela Sverige.",
+          "keywords": []
+        },
+        "hero": {
+          "eyebrow": "Digitaltryckeri i Sundsvall",
+          "headline": "Skyltar, dekor och trycksaker som lyfter ditt varumärke",
+          "subheadline": "MAWA Reklam designar, producerar och monterar lösningar för fordon, butiker och kampanjer. Vi levererar med hög kvalitet, bra pris och snabb återkoppling – i Sundsvall och över hela Sverige.",
+          "primaryCtaLabel": "Begär offert",
+          "primaryCtaHref": "#contact"
+        },
+        "intro": {
+          "heading": "Allt inom reklam och visuell kommunikation",
+          "body": "MAWA Reklam är ett digitaltryckeri som hjälper företag att synas bättre med fordonsdekor, butiksdekor, skyltar, dekaler, flaggor, vepor, visitkort, foldrar och andra trycksaker. Med utgångspunkt i Sundsvall levererar vi både lokalt och nationellt, alltid med fokus på kvalitet, prisvärdhet och en smidig process från idé till montering."
+        },
+        "services": {
+          "heading": "Våra tjänster",
+          "items": [
+            {
+              "title": "Fordonsdekor",
+              "description": "Profilera personbilar, transportbilar och större fordonsflottor med hållbara och professionella dekorer."
+            },
+            {
+              "title": "Butiksdekor",
+              "description": "Skapa en tydlig och inbjudande butiksmiljö med dekor, foliering och kampanjmaterial."
+            },
+            {
+              "title": "Flaggor och vepor",
+              "description": "Synlighet för event, fasader och kampanjer med skräddarsydda flaggor och vepor."
+            },
+            {
+              "title": "Visitkort och foldrar",
+              "description": "Trycksaker som ger ett professionellt intryck i möten, utskick och mässor."
+            },
+            {
+              "title": "Trycksaker",
+              "description": "Flexibla lösningar för allt från informationsmaterial till marknadsföringsmaterial."
+            },
+            {
+              "title": "Skyltar",
+              "description": "Skyltar för fasad, interiör och vägledning, anpassade efter behov och miljö."
+            }
+          ]
+        },
+        "about": {
+          "heading": "Om MAWA Reklam",
+          "body": "Vi är ett engagerat team med lång erfarenhet av reklamproduktion och montage. Med auktoriserad kompetens och ett starkt fokus på detaljer hjälper vi företag att få en tydlig och enhetlig profil. Vårt arbetssätt bygger på snabb återkoppling, hög service och lösningar som håller över tid. Från Sundsvall tar vi uppdrag i hela Sverige."
+        },
+        "usp": {
+          "heading": "Därför väljer kunder MAWA Reklam",
+          "items": [
+            "Snabb återkoppling",
+            "Hög kvalitet till rätt pris",
+            "Auktoriserad skyltskapare",
+            "Design, produktion och montering i samma flöde",
+            "Levererar i hela Sverige"
+          ]
+        },
+        "testimonials": {
+          "heading": "Vad våra kunder uppskattar",
+          "enabled": true,
+          "items": [
+            {
+              "name": "Kund inom transport",
+              "quote": "Snabb återkoppling och ett slutresultat som verkligen lyfte vår fordonsflotta."
+            },
+            {
+              "name": "Butiksägare",
+              "quote": "Smidig process från idé till färdig dekor, och resultatet blev precis som vi ville."
+            }
+          ]
+        },
+        "faq": {
+          "heading": "Vanliga frågor",
+          "enabled": true,
+          "items": [
+            {
+              "question": "Arbetar ni bara i Sundsvall?",
+              "answer": "Nej, vi utgår från Sundsvall men levererar produkter och tjänster över hela Sverige."
+            },
+            {
+              "question": "Hjälper ni även till med montering?",
+              "answer": "Ja, vi designar, producerar och monterar många av våra lösningar."
+            },
+            {
+              "question": "Kan ni ta fram både små och stora beställningar?",
+              "answer": "Ja, vi hanterar allt från mindre trycksaker till större dekor- och skyltprojekt."
+            }
+          ]
+        },
+        "contact": {
+          "heading": "Kontakta oss",
+          "body": "Berätta kort om ditt projekt så återkommer vi med förslag, pris och nästa steg. Vi hjälper dig att hitta rätt lösning för din profilering.",
+          "email": "manne@mawareklam.se",
+          "phone": "072-5235343",
+          "address": "Sundsvall, Sverige"
+        },
+        "footer": {
+          "companyName": "MAWA Reklam",
+          "tagline": "Skyltar, dekor och trycksaker med snabb återkoppling och hög kvalitet.",
+          "copyright": "© 2026 MAWA Reklam. Alla rättigheter förbehållna.",
+          "socialLinks": {
+            "facebook": "https://facebook.com/mawareklam"
+          }
+        },
+        "media": {
+          "logoUrl": "assets/generated/mawa-reklam-logo.png",
+          "heroImage": {
+            "url": "assets/generated/mawa-reklam-user-1.jpg",
+            "alt": "MAWA Reklam profilering med fordonsdekor och skyltar"
+          },
+          "aboutImage": {
+            "url": "assets/generated/mawa-reklam-user-1.jpg",
+            "alt": "Teamet på MAWA Reklam arbetar med design, produktion och montering"
+          },
+          "gallery": [
+            {
+              "url": "assets/generated/mawa-reklam-user-1.jpg",
+              "alt": "MAWA Reklam bild 1"
+            },
+            {
+              "url": "assets/generated/mawa-reklam-ai-hero.png",
+              "alt": "MAWA Reklam bild 2"
+            },
+            {
+              "url": "assets/generated/mawa-reklam-ai-about.png",
+              "alt": "MAWA Reklam bild 3"
+            }
+          ]
+        }
+      }
+    </script>
   </body>
 </html>

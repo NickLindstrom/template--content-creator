@@ -1,21 +1,21 @@
 <!doctype html>
-<html lang="{{site.language}}">
+<html lang="sv">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{seo.title}}</title>
-    <meta name="description" content="{{seo.description}}">
+    <title>Loading...</title>
+    <meta name="description" content="">
 
     <meta property="og:type" content="website">
-    <meta property="og:locale" content="{{og.locale}}">
-    <meta property="og:title" content="{{seo.title}}">
-    <meta property="og:description" content="{{seo.description}}">
-    <meta property="og:image" content="{{seo.ogImage}}">
+    <meta property="og:locale" content="sv_SE">
+    <meta property="og:title" content="">
+    <meta property="og:description" content="">
+    <meta property="og:image" content="">
 
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{seo.title}}">
-    <meta name="twitter:description" content="{{seo.description}}">
-    <meta name="twitter:image" content="{{seo.ogImage}}">
+    <meta name="twitter:title" content="">
+    <meta name="twitter:description" content="">
+    <meta name="twitter:image" content="">
 
     <link rel="stylesheet" href="main.css">
     <script defer src="index.js"></script>
@@ -25,15 +25,17 @@
 
     <header class="site-header">
       <div class="site-container header-inner">
-        {{headerBrand}}
+        <a id="header-brand" class="brand-mark" href="#top" aria-label="Till startsidan">
+          <span class="brand-mark__text">Laddar...</span>
+        </a>
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-navigation">
           Meny
         </button>
         <nav id="site-navigation" class="site-navigation" aria-label="Huvudmeny">
           <a class="site-navigation__link" href="#services">Tjanster</a>
           <a class="site-navigation__link" href="#about">Om oss</a>
-          {{galleryNavLink}}
-          <a class="site-navigation__link site-navigation__link--cta" href="{{hero.primaryCtaHref}}">{{hero.primaryCtaLabel}}</a>
+          <a id="gallery-nav-link" class="site-navigation__link" href="#gallery" hidden>Bilder</a>
+          <a id="nav-cta-link" class="site-navigation__link site-navigation__link--cta" href="#contact">Kontakt</a>
         </nav>
       </div>
     </header>
@@ -42,33 +44,31 @@
       <section id="top" class="hero-section">
         <div class="site-container hero-layout">
           <div class="hero-content">
-            <p class="section-eyebrow">{{hero.eyebrow}}</p>
-            <h1 class="hero-title">{{hero.headline}}</h1>
-            <p class="hero-text">{{hero.subheadline}}</p>
+            <p id="hero-eyebrow" class="section-eyebrow"></p>
+            <h1 id="hero-headline" class="hero-title"></h1>
+            <p id="hero-subheadline" class="hero-text"></p>
             <div class="hero-actions">
-              <a class="button button--primary" href="{{hero.primaryCtaHref}}">{{hero.primaryCtaLabel}}</a>
+              <a id="hero-primary-cta" class="button button--primary" href="#contact">Kontakta oss</a>
               <a class="button button--secondary" href="#services">Utforska tjanster</a>
             </div>
           </div>
-          {{heroVisual}}
+          <div id="hero-visual-slot"></div>
         </div>
       </section>
 
       <section class="intro-section section-spacing">
         <div class="site-container narrow-container">
           <p class="section-eyebrow">Introduktion</p>
-          <h2 class="section-title">{{intro.heading}}</h2>
-          <p class="section-text">{{intro.body}}</p>
+          <h2 id="intro-heading" class="section-title"></h2>
+          <p id="intro-body" class="section-text"></p>
         </div>
       </section>
 
       <section id="services" class="services-section section-spacing section-surface">
         <div class="site-container">
           <p class="section-eyebrow">Tjanster</p>
-          <h2 class="section-title">{{services.heading}}</h2>
-          <div class="services-grid">
-            {{servicesList}}
-          </div>
+          <h2 id="services-heading" class="section-title"></h2>
+          <div id="services-list" class="services-grid"></div>
         </div>
       </section>
 
@@ -76,36 +76,56 @@
         <div class="site-container about-layout">
           <div class="about-content">
             <p class="section-eyebrow">Om oss</p>
-            <h2 class="section-title">{{about.heading}}</h2>
-            <p class="section-text">{{about.body}}</p>
+            <h2 id="about-heading" class="section-title"></h2>
+            <p id="about-body" class="section-text"></p>
           </div>
-          {{aboutVisual}}
+          <div id="about-visual-slot"></div>
         </div>
       </section>
 
-      {{gallerySection}}
-      {{testimonialsSection}}
-      {{faqSection}}
+      <section id="gallery" class="gallery-section section-spacing" hidden>
+        <div class="site-container">
+          <p class="section-eyebrow">Bilder</p>
+          <h2 class="section-title">Inblick i verksamheten</h2>
+          <div id="gallery-grid" class="gallery-grid"></div>
+        </div>
+      </section>
+
+      <section id="testimonials-section" class="testimonials-section section-spacing" hidden>
+        <div class="site-container">
+          <p class="section-eyebrow">Omdomen</p>
+          <h2 id="testimonials-heading" class="section-title"></h2>
+          <div id="testimonials-list" class="testimonials-grid"></div>
+        </div>
+      </section>
+
+      <section id="faq" class="faq-section section-spacing" hidden>
+        <div class="site-container">
+          <p class="section-eyebrow">FAQ</p>
+          <h2 id="faq-heading" class="section-title"></h2>
+          <div id="faq-list" class="faq-list"></div>
+        </div>
+      </section>
 
       <section id="contact" class="contact-section section-spacing section-surface">
         <div class="site-container contact-layout">
           <div class="contact-content">
             <p class="section-eyebrow">Kontakt</p>
-            <h2 class="section-title">{{contact.heading}}</h2>
-            <p class="section-text">{{contact.body}}</p>
+            <h2 id="contact-heading" class="section-title"></h2>
+            <p id="contact-body" class="section-text"></p>
           </div>
           <div class="contact-card">
             <div class="contact-card__row">
               <span class="contact-card__label">Telefon</span>
-              <a class="contact-card__value" href="tel:{{contact.phoneRaw}}">{{contact.phone}}</a>
+              <a id="contact-phone" class="contact-card__value" href="#"></a>
             </div>
             <div class="contact-card__row">
               <span class="contact-card__label">E-post</span>
-              <a class="contact-card__value" href="mailto:{{contact.email}}">{{contact.email}}</a>
+              <a id="contact-email" class="contact-card__value" href="#"></a>
             </div>
             <div class="contact-card__row">
               <span class="contact-card__label">Adress</span>
-              <span class="contact-card__value">{{contact.address}}</span>
+              <span id="contact-address" class="contact-card__value"></span>
             </div>
           </div>
         </div>
@@ -115,16 +135,135 @@
     <footer class="site-footer">
       <div class="site-container footer-layout">
         <div class="site-footer__brand">
-          {{footerBrand}}
-          <p class="site-footer__text">{{footer.tagline}}</p>
+          <a id="footer-brand" class="brand-mark brand-mark--footer" href="#top" aria-label="Till startsidan">
+            <span class="brand-mark__text">Laddar...</span>
+          </a>
+          <p id="footer-tagline" class="site-footer__text"></p>
         </div>
-        <div class="site-footer__links">
-          {{socialLinks}}
-        </div>
+        <div id="social-links" class="site-footer__links"></div>
       </div>
       <div class="site-container footer-bottom-row">
-        <p class="footer-bottom-row__copyright">{{footer.copyright}}</p>
+        <p id="footer-copyright" class="footer-bottom-row__copyright"></p>
       </div>
     </footer>
-  </body>
+    <script id="initial-content" type="application/json">
+{
+  "site": {
+    "siteId": "00000000-0000-0000-0000-000000000000",
+    "companyName": "Exempel Elservice AB",
+    "displayName": "Exempel Elservice",
+    "language": "sv",
+    "primaryColor": "#1254c5",
+    "secondaryColor": "#172033"
+  },
+  "seo": {
+    "title": "Exempel Elservice i Stockholm | Elektriker for hem och foretag",
+    "description": "Exempel Elservice hjalper privatpersoner och foretag med elinstallationer, felsokning och laddboxar i Stockholm med omnejd.",
+    "keywords": [
+      "elektriker stockholm",
+      "laddbox",
+      "elinstallation"
+    ]
+  },
+  "hero": {
+    "eyebrow": "Elektriker i Stockholm",
+    "headline": "Trygg hjalp med elinstallationer och service",
+    "subheadline": "Vi hjalper privatpersoner och foretag med sakra, smidiga och professionella ellosningar i Stockholm.",
+    "primaryCtaLabel": "Begar offert",
+    "primaryCtaHref": "#contact"
+  },
+  "intro": {
+    "heading": "Din lokala expert",
+    "body": "Vi erbjuder snabb aterkoppling, tydliga priser och val utforta arbeten for bade sma och stora uppdrag."
+  },
+  "services": {
+    "heading": "Vara tjanster",
+    "items": [
+      {
+        "title": "Elinstallationer",
+        "description": "Installation av belysning, eluttag, centraler och fasta elarbeten."
+      },
+      {
+        "title": "Felsokning",
+        "description": "Snabb felsokning och atgard vid akuta eller aterkommande elproblem."
+      },
+      {
+        "title": "Laddboxar",
+        "description": "Installation och radgivning kring laddboxar for villa och foretag."
+      }
+    ]
+  },
+  "about": {
+    "heading": "Om oss",
+    "body": "Exempel Elservice ar ett erfaret foretag som satter sakerhet, tydlighet och god service i forsta rummet. Vart mal ar att gora det enkelt att fa ratt hjalp direkt."
+  },
+  "usp": {
+    "heading": "Darfor valjer kunder oss",
+    "items": [
+      "Snabb aterkoppling",
+      "Certifierad kompetens",
+      "Tydliga priser"
+    ]
+  },
+  "testimonials": {
+    "heading": "Vad kunder sager",
+    "enabled": true,
+    "items": [
+      {
+        "name": "Anna",
+        "quote": "Snabb hjalp och valdigt proffsigt bemotande."
+      },
+      {
+        "name": "Johan",
+        "quote": "Tydlig offert, bra kommunikation och snyggt utfort arbete."
+      }
+    ]
+  },
+  "faq": {
+    "heading": "Vanliga fragor",
+    "enabled": true,
+    "items": [
+      {
+        "question": "Vilka omraden arbetar ni i?",
+        "answer": "Vi arbetar framst i Stockholm med omnejd."
+      },
+      {
+        "question": "Kan jag fa offert innan arbete paborjas?",
+        "answer": "Ja, vi erbjuder tydliga offerter innan vi satter igang."
+      }
+    ]
+  },
+  "contact": {
+    "heading": "Kontakta oss",
+    "body": "Hor av dig sa aterkommer vi sa snart vi kan.",
+    "phone": "0701234567",
+    "email": "kontakt@exempel.se",
+    "address": "Exempelgatan 1, 111 22 Stockholm"
+  },
+  "footer": {
+    "companyName": "Exempel Elservice AB",
+    "tagline": "Professionella elarbeten for privatpersoner och foretag.",
+    "copyright": "© 2026 Exempel Elservice AB",
+    "socialLinks": {
+      "facebook": "",
+      "instagram": "",
+      "linkedin": ""
+    }
+  },
+  "media": {
+    "logoUrl": null,
+    "heroImage": {
+      "url": "",
+      "alt": ""
+    },
+    "aboutImage": {
+      "url": "",
+      "alt": ""
+    },
+    "gallery": []
+  }
+}
+
+  </script></body>
 </html>
+
