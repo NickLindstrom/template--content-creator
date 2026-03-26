@@ -5,6 +5,7 @@ const projectRoot = path.resolve(__dirname, "..");
 const contentPath = path.join(projectRoot, "content", "home.json");
 const templatePath = path.join(projectRoot, "src", "template.html");
 const outputPath = path.join(projectRoot, "index.html");
+const generatedAssetsDir = path.join(projectRoot, "assets", "generated");
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
@@ -25,6 +26,79 @@ function get(obj, keyPath) {
 
 function localeFromLanguage(language) {
   return language === "sv" ? "sv_SE" : "en_US";
+}
+
+function listGeneratedAssetUrls() {
+  if (!fs.existsSync(generatedAssetsDir)) {
+    return [];
+  }
+
+  return fs.readdirSync(generatedAssetsDir)
+    .filter((name) => fs.statSync(path.join(generatedAssetsDir, name)).isFile())
+    .sort()
+    .map((name) => `assets/generated/${name}`);
+}
+
+function firstMatchingAsset(assetUrls, matcher) {
+  return assetUrls.find((url) => matcher(path.basename(url).toLowerCase())) || "";
+}
+
+function hasNonEmptyUrl(value) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function resolveMedia(content) {
+  const assetUrls = listGeneratedAssetUrls();
+  const configuredMedia = content.media || {};
+
+  const generatedLogoUrl = firstMatchingAsset(assetUrls, (name) => name.includes("-logo."));
+  const generatedHeroUrl = firstMatchingAsset(assetUrls, (name) => name.includes("-ai-hero."));
+  const generatedAboutUrl = firstMatchingAsset(assetUrls, (name) => name.includes("-ai-about."));
+  const generatedUserUrls = assetUrls.filter((url) => path.basename(url).toLowerCase().includes("-user-"));
+
+  const logoUrl = generatedLogoUrl || (hasNonEmptyUrl(configuredMedia.logoUrl) ? configuredMedia.logoUrl : "");
+  const heroImageUrl =
+    generatedUserUrls[0] ||
+    generatedHeroUrl ||
+    (hasNonEmptyUrl(configuredMedia.heroImage?.url) ? configuredMedia.heroImage.url : "");
+  const aboutImageUrl =
+    generatedUserUrls[1] ||
+    generatedAboutUrl ||
+    generatedUserUrls[0] ||
+    (hasNonEmptyUrl(configuredMedia.aboutImage?.url) ? configuredMedia.aboutImage.url : "");
+
+  const reserved = new Set([logoUrl, heroImageUrl, aboutImageUrl].filter(Boolean));
+
+  const generatedGalleryUrls = assetUrls.filter((url) => !reserved.has(url));
+  const configuredGallery = Array.isArray(configuredMedia.gallery) ? configuredMedia.gallery : [];
+  const configuredGalleryItems = configuredGallery
+    .filter((item) => item && hasNonEmptyUrl(item.url) && !reserved.has(item.url))
+    .map((item) => ({
+      url: item.url,
+      alt: item.alt || `${content.site.displayName} bild`
+    }));
+
+  const generatedGalleryItems = generatedGalleryUrls.map((url, index) => ({
+    url,
+    alt: `${content.site.displayName} bild ${index + 1}`
+  }));
+
+  return {
+    logoUrl: logoUrl || null,
+    heroImage: heroImageUrl
+      ? {
+          url: heroImageUrl,
+          alt: configuredMedia.heroImage?.alt || `${content.site.displayName} hero-bild`
+        }
+      : null,
+    aboutImage: aboutImageUrl
+      ? {
+          url: aboutImageUrl,
+          alt: configuredMedia.aboutImage?.alt || `${content.site.displayName} verksamhetsbild`
+        }
+      : null,
+    gallery: generatedGalleryItems.length > 0 ? generatedGalleryItems : configuredGalleryItems
+  };
 }
 
 function renderBrand({ companyName, logoUrl, className }) {
@@ -62,7 +136,7 @@ function renderTestimonials(testimonials) {
     .map((item) => `
     <article class="testimonial-card">
       <h3 class="testimonial-card__name">${escapeHtml(item.name)}</h3>
-      <p class="testimonial-card__text">\"${escapeHtml(item.quote)}\"</p>
+      <p class="testimonial-card__text">"${escapeHtml(item.quote)}"</p>
     </article>
   `)
     .join("");
@@ -145,10 +219,53 @@ function renderGallery(gallery) {
   `;
 }
 
+function renderHeroVisual(media, site, contact) {
+  if (!media.heroImage) {
+    return "";
+  }
+
+  return `
+    <div class="hero-visual">
+      <div class="hero-visual__main-card">
+        <img class="hero-visual__image" src="${escapeHtml(media.heroImage.url)}" alt="${escapeHtml(media.heroImage.alt)}">
+      </div>
+      <div class="hero-visual__floating-card">
+        <p class="hero-visual__label">Lokalt fokus</p>
+        <p class="hero-visual__value">${escapeHtml(site.displayName)}</p>
+        <p class="hero-visual__caption">${escapeHtml(contact.address)}</p>
+      </div>
+    </div>
+  `;
+}
+
+function renderAboutVisual(media, usp) {
+  const imageBlock = media.aboutImage
+    ? `
+      <div class="about-media__image-frame">
+        <img class="about-media__image" src="${escapeHtml(media.aboutImage.url)}" alt="${escapeHtml(media.aboutImage.alt)}">
+      </div>
+    `
+    : "";
+
+  return `
+    <div class="about-media">
+      ${imageBlock}
+      <div class="highlight-panel">
+        <p class="highlight-panel__label">${escapeHtml(usp.heading)}</p>
+        <ul class="usp-list">
+          ${renderUsp(usp.items)}
+        </ul>
+      </div>
+    </div>
+  `;
+}
+
 function renderPage(content) {
   const template = fs.readFileSync(templatePath, "utf8");
+  const resolvedMedia = resolveMedia(content);
   const enriched = {
     ...content,
+    media: resolvedMedia,
     og: {
       locale: localeFromLanguage(content.site.language)
     },
@@ -158,24 +275,26 @@ function renderPage(content) {
     },
     seo: {
       ...content.seo,
-      ogImage: content.media?.heroImage?.url || "assets/og-default.svg"
+      ogImage: resolvedMedia.heroImage?.url || ""
     }
   };
 
   let html = template
     .replace("{{headerBrand}}", renderBrand({
       companyName: content.site.displayName,
-      logoUrl: content.media?.logoUrl,
+      logoUrl: resolvedMedia.logoUrl,
       className: "brand-mark"
     }))
     .replace("{{footerBrand}}", renderBrand({
       companyName: content.footer.companyName,
-      logoUrl: content.media?.logoUrl,
+      logoUrl: resolvedMedia.logoUrl,
       className: "brand-mark brand-mark--footer"
     }))
+    .replace("{{galleryNavLink}}", resolvedMedia.gallery.length > 0 ? '<a class="site-navigation__link" href="#gallery">Bilder</a>' : "")
     .replace("{{servicesList}}", renderServices(content.services.items))
-    .replace("{{uspList}}", renderUsp(content.usp.items))
-    .replace("{{gallerySection}}", renderGallery(content.media?.gallery))
+    .replace("{{heroVisual}}", renderHeroVisual(resolvedMedia, content.site, content.contact))
+    .replace("{{aboutVisual}}", renderAboutVisual(resolvedMedia, content.usp))
+    .replace("{{gallerySection}}", renderGallery(resolvedMedia.gallery))
     .replace("{{testimonialsSection}}", renderTestimonials(content.testimonials))
     .replace("{{faqSection}}", renderFaq(content.faq))
     .replace("{{socialLinks}}", renderSocialLinks(content.footer.socialLinks));

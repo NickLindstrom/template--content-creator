@@ -102,28 +102,15 @@
     }
   },
   "media": {
-    "logoUrl": "assets/logo-mark.svg",
+    "logoUrl": null,
     "heroImage": {
-      "url": "assets/hero-illustration.svg",
-      "alt": "Illustration av modern verksamhet"
+      "url": "",
+      "alt": ""
     },
     "aboutImage": {
-      "url": "assets/about-illustration.svg",
-      "alt": "Illustration av arbetssituation"
+      "url": "",
+      "alt": ""
     },
-    "gallery": [
-      {
-        "url": "assets/hero-illustration.svg",
-        "alt": "Hero-bild for verksamheten"
-      },
-      {
-        "url": "assets/about-illustration.svg",
-        "alt": "Verksamhetsbild for om-sektionen"
-      },
-      {
-        "url": "assets/detail-pattern.svg",
-        "alt": "Detaljbild med grafiskt monster"
-      }
-    ]
+    "gallery": []
   }
 }

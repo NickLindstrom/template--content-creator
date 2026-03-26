@@ -32,7 +32,7 @@
         <nav id="site-navigation" class="site-navigation" aria-label="Huvudmeny">
           <a class="site-navigation__link" href="#services">Tjanster</a>
           <a class="site-navigation__link" href="#about">Om oss</a>
-          <a class="site-navigation__link" href="#gallery">Bilder</a>
+          {{galleryNavLink}}
           <a class="site-navigation__link site-navigation__link--cta" href="{{hero.primaryCtaHref}}">{{hero.primaryCtaLabel}}</a>
         </nav>
       </div>
@@ -50,16 +50,7 @@
               <a class="button button--secondary" href="#services">Utforska tjanster</a>
             </div>
           </div>
-          <div class="hero-visual">
-            <div class="hero-visual__main-card">
-              <img class="hero-visual__image" src="{{media.heroImage.url}}" alt="{{media.heroImage.alt}}">
-            </div>
-            <div class="hero-visual__floating-card">
-              <p class="hero-visual__label">Lokalt fokus</p>
-              <p class="hero-visual__value">{{site.displayName}}</p>
-              <p class="hero-visual__caption">{{contact.address}}</p>
-            </div>
-          </div>
+          {{heroVisual}}
         </div>
       </section>
 
@@ -88,17 +79,7 @@
             <h2 class="section-title">{{about.heading}}</h2>
             <p class="section-text">{{about.body}}</p>
           </div>
-          <div class="about-media">
-            <div class="about-media__image-frame">
-              <img class="about-media__image" src="{{media.aboutImage.url}}" alt="{{media.aboutImage.alt}}">
-            </div>
-            <div class="highlight-panel">
-              <p class="highlight-panel__label">{{usp.heading}}</p>
-              <ul class="usp-list">
-                {{uspList}}
-              </ul>
-            </div>
-          </div>
+          {{aboutVisual}}
         </div>
       </section>
 
