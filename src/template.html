@@ -1,23 +1,23 @@
 <!doctype html>
 <html lang="sv">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Loading...</title>
-    <meta name="description" content="">
+    <meta name="description" content="" />
 
-    <meta property="og:type" content="website">
-    <meta property="og:locale" content="sv_SE">
-    <meta property="og:title" content="">
-    <meta property="og:description" content="">
-    <meta property="og:image" content="">
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="sv_SE" />
+    <meta property="og:title" content="" />
+    <meta property="og:description" content="" />
+    <meta property="og:image" content="" />
 
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="">
-    <meta name="twitter:description" content="">
-    <meta name="twitter:image" content="">
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="" />
+    <meta name="twitter:description" content="" />
+    <meta name="twitter:image" content="" />
 
-    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="main.css" />
     <script defer src="index.js"></script>
   </head>
   <body class="site-body">
@@ -25,17 +25,42 @@
 
     <header class="site-header">
       <div class="site-container header-inner">
-        <a id="header-brand" class="brand-mark" href="#top" aria-label="Till startsidan">
+        <a
+          id="header-brand"
+          class="brand-mark"
+          href="#top"
+          aria-label="Till startsidan"
+        >
           <span class="brand-mark__text">Laddar...</span>
         </a>
-        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-navigation">
+        <button
+          class="nav-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="site-navigation"
+        >
           Meny
         </button>
-        <nav id="site-navigation" class="site-navigation" aria-label="Huvudmeny">
-          <a class="site-navigation__link" href="#services">Tjanster</a>
+        <nav
+          id="site-navigation"
+          class="site-navigation"
+          aria-label="Huvudmeny"
+        >
+          <a class="site-navigation__link" href="#services">Tjänster</a>
           <a class="site-navigation__link" href="#about">Om oss</a>
-          <a id="gallery-nav-link" class="site-navigation__link" href="#gallery" hidden>Bilder</a>
-          <a id="nav-cta-link" class="site-navigation__link site-navigation__link--cta" href="#contact">Kontakt</a>
+          <a
+            id="gallery-nav-link"
+            class="site-navigation__link"
+            href="#gallery"
+            hidden
+            >Bilder</a
+          >
+          <a
+            id="nav-cta-link"
+            class="site-navigation__link site-navigation__link--cta"
+            href="#contact"
+            >Kontakt</a
+          >
         </nav>
       </div>
     </header>
@@ -48,8 +73,15 @@
             <h1 id="hero-headline" class="hero-title"></h1>
             <p id="hero-subheadline" class="hero-text"></p>
             <div class="hero-actions">
-              <a id="hero-primary-cta" class="button button--primary" href="#contact">Kontakta oss</a>
-              <a class="button button--secondary" href="#services">Utforska tjanster</a>
+              <a
+                id="hero-primary-cta"
+                class="button button--primary"
+                href="#contact"
+                >Kontakta oss</a
+              >
+              <a class="button button--secondary" href="#services"
+                >Utforska tjänster</a
+              >
             </div>
           </div>
           <div id="hero-visual-slot"></div>
@@ -64,9 +96,12 @@
         </div>
       </section>
 
-      <section id="services" class="services-section section-spacing section-surface">
+      <section
+        id="services"
+        class="services-section section-spacing section-surface"
+      >
         <div class="site-container">
-          <p class="section-eyebrow">Tjanster</p>
+          <p class="section-eyebrow">Tjänster</p>
           <h2 id="services-heading" class="section-title"></h2>
           <div id="services-list" class="services-grid"></div>
         </div>
@@ -91,7 +126,11 @@
         </div>
       </section>
 
-      <section id="testimonials-section" class="testimonials-section section-spacing" hidden>
+      <section
+        id="testimonials-section"
+        class="testimonials-section section-spacing"
+        hidden
+      >
         <div class="site-container">
           <p class="section-eyebrow">Omdomen</p>
           <h2 id="testimonials-heading" class="section-title"></h2>
@@ -107,7 +146,10 @@
         </div>
       </section>
 
-      <section id="contact" class="contact-section section-spacing section-surface">
+      <section
+        id="contact"
+        class="contact-section section-spacing section-surface"
+      >
         <div class="site-container contact-layout">
           <div class="contact-content">
             <p class="section-eyebrow">Kontakt</p>
@@ -135,7 +177,12 @@
     <footer class="site-footer">
       <div class="site-container footer-layout">
         <div class="site-footer__brand">
-          <a id="footer-brand" class="brand-mark brand-mark--footer" href="#top" aria-label="Till startsidan">
+          <a
+            id="footer-brand"
+            class="brand-mark brand-mark--footer"
+            href="#top"
+            aria-label="Till startsidan"
+          >
             <span class="brand-mark__text">Laddar...</span>
           </a>
           <p id="footer-tagline" class="site-footer__text"></p>
@@ -147,123 +194,118 @@
       </div>
     </footer>
     <script id="initial-content" type="application/json">
-{
-  "site": {
-    "siteId": "00000000-0000-0000-0000-000000000000",
-    "companyName": "Exempel Elservice AB",
-    "displayName": "Exempel Elservice",
-    "language": "sv",
-    "primaryColor": "#1254c5",
-    "secondaryColor": "#172033"
-  },
-  "seo": {
-    "title": "Exempel Elservice i Stockholm | Elektriker for hem och foretag",
-    "description": "Exempel Elservice hjalper privatpersoner och foretag med elinstallationer, felsokning och laddboxar i Stockholm med omnejd.",
-    "keywords": [
-      "elektriker stockholm",
-      "laddbox",
-      "elinstallation"
-    ]
-  },
-  "hero": {
-    "eyebrow": "Elektriker i Stockholm",
-    "headline": "Trygg hjalp med elinstallationer och service",
-    "subheadline": "Vi hjalper privatpersoner och foretag med sakra, smidiga och professionella ellosningar i Stockholm.",
-    "primaryCtaLabel": "Begar offert",
-    "primaryCtaHref": "#contact"
-  },
-  "intro": {
-    "heading": "Din lokala expert",
-    "body": "Vi erbjuder snabb aterkoppling, tydliga priser och val utforta arbeten for bade sma och stora uppdrag."
-  },
-  "services": {
-    "heading": "Vara tjanster",
-    "items": [
       {
-        "title": "Elinstallationer",
-        "description": "Installation av belysning, eluttag, centraler och fasta elarbeten."
-      },
-      {
-        "title": "Felsokning",
-        "description": "Snabb felsokning och atgard vid akuta eller aterkommande elproblem."
-      },
-      {
-        "title": "Laddboxar",
-        "description": "Installation och radgivning kring laddboxar for villa och foretag."
+        "site": {
+          "siteId": "00000000-0000-0000-0000-000000000000",
+          "companyName": "Exempel Elservice AB",
+          "displayName": "Exempel Elservice",
+          "language": "sv",
+          "primaryColor": "#1254c5",
+          "secondaryColor": "#172033"
+        },
+        "seo": {
+          "title": "Exempel Elservice i Stockholm | Elektriker for hem och foretag",
+          "description": "Exempel Elservice hjalper privatpersoner och foretag med elinstallationer, felsokning och laddboxar i Stockholm med omnejd.",
+          "keywords": ["elektriker stockholm", "laddbox", "elinstallation"]
+        },
+        "hero": {
+          "eyebrow": "Elektriker i Stockholm",
+          "headline": "Trygg hjalp med elinstallationer och service",
+          "subheadline": "Vi hjalper privatpersoner och foretag med sakra, smidiga och professionella ellosningar i Stockholm.",
+          "primaryCtaLabel": "Begar offert",
+          "primaryCtaHref": "#contact"
+        },
+        "intro": {
+          "heading": "Din lokala expert",
+          "body": "Vi erbjuder snabb aterkoppling, tydliga priser och val utforta arbeten for bade sma och stora uppdrag."
+        },
+        "services": {
+          "heading": "Vara tjänster",
+          "items": [
+            {
+              "title": "Elinstallationer",
+              "description": "Installation av belysning, eluttag, centraler och fasta elarbeten."
+            },
+            {
+              "title": "Felsokning",
+              "description": "Snabb felsokning och atgard vid akuta eller aterkommande elproblem."
+            },
+            {
+              "title": "Laddboxar",
+              "description": "Installation och radgivning kring laddboxar for villa och foretag."
+            }
+          ]
+        },
+        "about": {
+          "heading": "Om oss",
+          "body": "Exempel Elservice ar ett erfaret foretag som satter sakerhet, tydlighet och god service i forsta rummet. Vart mal ar att gora det enkelt att fa ratt hjalp direkt."
+        },
+        "usp": {
+          "heading": "Darfor valjer kunder oss",
+          "items": [
+            "Snabb aterkoppling",
+            "Certifierad kompetens",
+            "Tydliga priser"
+          ]
+        },
+        "testimonials": {
+          "heading": "Vad kunder sager",
+          "enabled": true,
+          "items": [
+            {
+              "name": "Anna",
+              "quote": "Snabb hjalp och valdigt proffsigt bemotande."
+            },
+            {
+              "name": "Johan",
+              "quote": "Tydlig offert, bra kommunikation och snyggt utfort arbete."
+            }
+          ]
+        },
+        "faq": {
+          "heading": "Vanliga fragor",
+          "enabled": true,
+          "items": [
+            {
+              "question": "Vilka omraden arbetar ni i?",
+              "answer": "Vi arbetar framst i Stockholm med omnejd."
+            },
+            {
+              "question": "Kan jag fa offert innan arbete paborjas?",
+              "answer": "Ja, vi erbjuder tydliga offerter innan vi satter igang."
+            }
+          ]
+        },
+        "contact": {
+          "heading": "Kontakta oss",
+          "body": "Hor av dig sa aterkommer vi sa snart vi kan.",
+          "phone": "0701234567",
+          "email": "kontakt@exempel.se",
+          "address": "Exempelgatan 1, 111 22 Stockholm"
+        },
+        "footer": {
+          "companyName": "Exempel Elservice AB",
+          "tagline": "Professionella elarbeten for privatpersoner och foretag.",
+          "copyright": "� 2026 Exempel Elservice AB",
+          "socialLinks": {
+            "facebook": "",
+            "instagram": "",
+            "linkedin": ""
+          }
+        },
+        "media": {
+          "logoUrl": null,
+          "heroImage": {
+            "url": "",
+            "alt": ""
+          },
+          "aboutImage": {
+            "url": "",
+            "alt": ""
+          },
+          "gallery": []
+        }
       }
-    ]
-  },
-  "about": {
-    "heading": "Om oss",
-    "body": "Exempel Elservice ar ett erfaret foretag som satter sakerhet, tydlighet och god service i forsta rummet. Vart mal ar att gora det enkelt att fa ratt hjalp direkt."
-  },
-  "usp": {
-    "heading": "Darfor valjer kunder oss",
-    "items": [
-      "Snabb aterkoppling",
-      "Certifierad kompetens",
-      "Tydliga priser"
-    ]
-  },
-  "testimonials": {
-    "heading": "Vad kunder sager",
-    "enabled": true,
-    "items": [
-      {
-        "name": "Anna",
-        "quote": "Snabb hjalp och valdigt proffsigt bemotande."
-      },
-      {
-        "name": "Johan",
-        "quote": "Tydlig offert, bra kommunikation och snyggt utfort arbete."
-      }
-    ]
-  },
-  "faq": {
-    "heading": "Vanliga fragor",
-    "enabled": true,
-    "items": [
-      {
-        "question": "Vilka omraden arbetar ni i?",
-        "answer": "Vi arbetar framst i Stockholm med omnejd."
-      },
-      {
-        "question": "Kan jag fa offert innan arbete paborjas?",
-        "answer": "Ja, vi erbjuder tydliga offerter innan vi satter igang."
-      }
-    ]
-  },
-  "contact": {
-    "heading": "Kontakta oss",
-    "body": "Hor av dig sa aterkommer vi sa snart vi kan.",
-    "phone": "0701234567",
-    "email": "kontakt@exempel.se",
-    "address": "Exempelgatan 1, 111 22 Stockholm"
-  },
-  "footer": {
-    "companyName": "Exempel Elservice AB",
-    "tagline": "Professionella elarbeten for privatpersoner och foretag.",
-    "copyright": "� 2026 Exempel Elservice AB",
-    "socialLinks": {
-      "facebook": "",
-      "instagram": "",
-      "linkedin": ""
-    }
-  },
-  "media": {
-    "logoUrl": null,
-    "heroImage": {
-      "url": "",
-      "alt": ""
-    },
-    "aboutImage": {
-      "url": "",
-      "alt": ""
-    },
-    "gallery": []
-  }
-}
-
-  </script></body>
+    </script>
+  </body>
 </html>
-
