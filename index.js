@@ -184,12 +184,8 @@
     var grid = document.getElementById('gallery-grid');
     if (!section || !navLink || !grid) return;
 
-    var logoUrl = content.media && content.media.logoUrl ? content.media.logoUrl : '';
-    var heroUrl = content.media && content.media.heroImage ? content.media.heroImage.url : '';
-    var aboutUrl = content.media && content.media.aboutImage ? content.media.aboutImage.url : '';
-    var reserved = [logoUrl, heroUrl, aboutUrl].filter(Boolean);
     var galleryItems = (content.media && Array.isArray(content.media.gallery) ? content.media.gallery : []).filter(function (item) {
-      return item && item.url && reserved.indexOf(item.url) === -1;
+      return item && item.url;
     });
 
     var visible = galleryItems.length > 0;
