@@ -1,6 +1,6 @@
 (function () {
   var navToggle = document.querySelector('.nav-toggle');
-  var siteNavigation = document.querySelector('.site-navigation');
+  var siteNavigation = document.querySelector('#site-navigation, .site-navigation, .editorial-nav, .showcase-nav');
 
   function escapeHtml(value) {
     return String(value ?? '')
@@ -13,6 +13,41 @@
 
   function localeFromLanguage(language) {
     return language === 'sv' ? 'sv_SE' : 'en_US';
+  }
+
+  function hasText(value) {
+    return Boolean(String(value || '').trim());
+  }
+
+  function hasVisibleItems(items) {
+    return Array.isArray(items) && items.some(function (item) {
+      if (typeof item === 'string') {
+        return hasText(item);
+      }
+
+      if (!item || typeof item !== 'object') {
+        return false;
+      }
+
+      return Object.values(item).some(function (value) {
+        return hasText(value);
+      });
+    });
+  }
+
+  function setThemeMode(mode) {
+    var resolvedMode = mode === 'dark' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme-mode', resolvedMode);
+    if (document.body) {
+      document.body.setAttribute('data-theme-mode', resolvedMode);
+    }
+  }
+
+  function setHidden(id, hidden) {
+    var element = document.getElementById(id);
+    if (element) {
+      element.hidden = hidden;
+    }
   }
 
   function readEmbeddedContent() {
@@ -41,11 +76,14 @@
     }
   }
 
-  function setLink(id, href, label) {
+  function setLink(id, href, label, visible) {
     var element = document.getElementById(id);
     if (!element) return;
     element.setAttribute('href', href || '#');
     element.textContent = label || '';
+    if (typeof visible === 'boolean') {
+      element.hidden = !visible;
+    }
   }
 
   function createBrand(elementId, companyName, logoUrl) {
@@ -68,16 +106,27 @@
     element.appendChild(text);
   }
 
-  function renderServices(items) {
+  function renderServices(content) {
+    var section = document.getElementById('services');
+    var navLink = document.getElementById('services-nav-link');
     var container = document.getElementById('services-list');
     if (!container) return;
     container.innerHTML = '';
 
-    (items || []).forEach(function (item) {
+    var items = (content.services && Array.isArray(content.services.items) ? content.services.items : []).filter(function (item) {
+      return item && (hasText(item.title) || hasText(item.description));
+    });
+    var visible = items.length > 0;
+    if (section) section.hidden = !visible;
+    if (navLink) navLink.hidden = !visible;
+    if (!visible) return;
+
+    setText('services-heading', content.services.heading);
+    items.forEach(function (item) {
       var article = document.createElement('article');
       article.className = 'service-card';
       article.innerHTML = [
-        '<div class="service-card__media"><span class="service-card__badge">Tjanst</span></div>',
+        '<div class="service-card__media"><span class="service-card__badge">Tjänst</span></div>',
         '<h3 class="service-card__title">' + escapeHtml(item.title) + '</h3>',
         '<p class="service-card__text">' + escapeHtml(item.description) + '</p>'
       ].join('');
@@ -108,6 +157,16 @@
     ].join('');
   }
 
+  function renderIntro(content) {
+    var section = document.getElementById('intro-section');
+    if (!section) return;
+    var visible = hasText(content.intro && content.intro.heading) || hasText(content.intro && content.intro.body);
+    section.hidden = !visible;
+    if (!visible) return;
+    setText('intro-heading', content.intro.heading);
+    setText('intro-body', content.intro.body);
+  }
+
   function renderAboutVisual(content) {
     var container = document.getElementById('about-visual-slot');
     if (!container) return;
@@ -121,21 +180,42 @@
       ].join('');
     }
 
-    var uspItems = (content.usp.items || [])
+    var uspItems = (content.usp && Array.isArray(content.usp.items) ? content.usp.items : [])
+      .filter(function (item) { return hasText(item); })
       .map(function (item) {
         return '<li class="usp-list__item">' + escapeHtml(item) + '</li>';
       })
       .join('');
 
+    var hasHighlight = uspItems || hasText(content.usp && content.usp.heading);
+
     container.innerHTML = [
       '<div class="about-media">',
       imageBlock,
-      '  <div class="highlight-panel">',
-      '    <p class="highlight-panel__label">' + escapeHtml(content.usp.heading) + '</p>',
-      '    <ul class="usp-list">' + uspItems + '</ul>',
-      '  </div>',
+      hasHighlight
+        ? '  <div class="highlight-panel">' +
+          '    <p class="highlight-panel__label">' + escapeHtml((content.usp && content.usp.heading) || '') + '</p>' +
+          '    <ul class="usp-list">' + uspItems + '</ul>' +
+          '  </div>'
+        : '',
       '</div>'
     ].join('');
+  }
+
+  function renderAbout(content) {
+    var section = document.getElementById('about');
+    var navLink = document.getElementById('about-nav-link');
+    var hasAboutText = hasText(content.about && content.about.heading) || hasText(content.about && content.about.body);
+    var hasAboutMedia = Boolean(content.media && content.media.aboutImage && content.media.aboutImage.url);
+    var hasUspContent = hasText(content.usp && content.usp.heading) || hasVisibleItems(content.usp && content.usp.items);
+    var visible = hasAboutText || hasAboutMedia || hasUspContent;
+    if (section) section.hidden = !visible;
+    if (navLink) navLink.hidden = !visible;
+    if (!visible) return;
+
+    setText('about-heading', content.about.heading);
+    setText('about-body', content.about.body);
+    renderAboutVisual(content);
   }
 
   function renderTestimonials(content) {
@@ -143,12 +223,16 @@
     var list = document.getElementById('testimonials-list');
     if (!section || !list) return;
 
-    var enabled = Boolean(content.testimonials && content.testimonials.enabled && (content.testimonials.items || []).length > 0);
-    section.hidden = !enabled;
-    if (!enabled) return;
+    var items = (content.testimonials && Array.isArray(content.testimonials.items) ? content.testimonials.items : []).filter(function (item) {
+      return item && (hasText(item.name) || hasText(item.quote));
+    });
+    var visible = Boolean(content.testimonials && content.testimonials.enabled && items.length > 0);
+    section.hidden = !visible;
+    list.innerHTML = '';
+    if (!visible) return;
 
     setText('testimonials-heading', content.testimonials.heading);
-    list.innerHTML = (content.testimonials.items || []).map(function (item) {
+    list.innerHTML = items.map(function (item) {
       return [
         '<article class="testimonial-card">',
         '  <h3 class="testimonial-card__name">' + escapeHtml(item.name) + '</h3>',
@@ -163,12 +247,16 @@
     var list = document.getElementById('faq-list');
     if (!section || !list) return;
 
-    var enabled = Boolean(content.faq && content.faq.enabled && (content.faq.items || []).length > 0);
-    section.hidden = !enabled;
-    if (!enabled) return;
+    var items = (content.faq && Array.isArray(content.faq.items) ? content.faq.items : []).filter(function (item) {
+      return item && (hasText(item.question) || hasText(item.answer));
+    });
+    var visible = Boolean(content.faq && content.faq.enabled && items.length > 0);
+    section.hidden = !visible;
+    list.innerHTML = '';
+    if (!visible) return;
 
     setText('faq-heading', content.faq.heading);
-    list.innerHTML = (content.faq.items || []).map(function (item) {
+    list.innerHTML = items.map(function (item) {
       return [
         '<article class="faq-item">',
         '  <h3 class="faq-item__question">' + escapeHtml(item.question) + '</h3>',
@@ -181,9 +269,8 @@
   function renderGallery(content) {
     var section = document.getElementById('gallery');
     var navLink = document.getElementById('gallery-nav-link');
-    var heading = document.getElementById('gallery-heading');
     var grid = document.getElementById('gallery-grid');
-    if (!section || !navLink || !heading || !grid) return;
+    if (!section || !navLink || !grid) return;
 
     var galleryItems = (content.media && Array.isArray(content.media.gallery) ? content.media.gallery : []).filter(function (item) {
       return item && item.url;
@@ -192,9 +279,9 @@
     var visible = galleryItems.length > 0;
     section.hidden = !visible;
     navLink.hidden = !visible;
+    grid.innerHTML = '';
 
     if (!visible) {
-      grid.innerHTML = '';
       return;
     }
 
@@ -208,6 +295,21 @@
     }).join('');
   }
 
+  function renderContact(content) {
+    var section = document.getElementById('contact');
+    var visible = hasText(content.contact && content.contact.heading) || hasText(content.contact && content.contact.body) || hasText(content.contact && content.contact.phone) || hasText(content.contact && content.contact.email) || hasText(content.contact && content.contact.address);
+    setHidden('contact', !visible);
+    setLink('nav-cta-link', content.hero && content.hero.primaryCtaHref, content.hero && content.hero.primaryCtaLabel, visible && hasText(content.hero && content.hero.primaryCtaLabel));
+    setLink('hero-primary-cta', content.hero && content.hero.primaryCtaHref, content.hero && content.hero.primaryCtaLabel, visible && hasText(content.hero && content.hero.primaryCtaLabel));
+    if (!section || !visible) return;
+
+    setText('contact-heading', content.contact.heading);
+    setText('contact-body', content.contact.body);
+    setLink('contact-phone', 'tel:' + String((content.contact && content.contact.phone) || '').replace(/\s+/g, ''), content.contact.phone, hasText(content.contact.phone));
+    setLink('contact-email', 'mailto:' + ((content.contact && content.contact.email) || ''), content.contact.email, hasText(content.contact.email));
+    setText('contact-address', content.contact.address);
+  }
+
   function renderSocialLinks(content) {
     var container = document.getElementById('social-links');
     if (!container) return;
@@ -217,7 +319,7 @@
     });
 
     if (!entries.length) {
-      container.innerHTML = '<span class="site-footer__meta">Inga sociala lankar angivna.</span>';
+      container.innerHTML = '<span class="site-footer__meta">Inga sociala länkar angivna.</span>';
       return;
     }
 
@@ -240,35 +342,28 @@
   }
 
   function applyContent(content) {
+    setThemeMode(content.site && content.site.themeMode);
     applySeo(content);
     createBrand('header-brand', content.site.displayName, content.media && content.media.logoUrl);
     createBrand('footer-brand', content.footer.companyName, content.media && content.media.logoUrl);
-    setLink('nav-cta-link', content.hero.primaryCtaHref, content.hero.primaryCtaLabel);
     setText('hero-eyebrow', content.hero.eyebrow);
     setText('hero-headline', content.hero.headline);
     setText('hero-subheadline', content.hero.subheadline);
-    setLink('hero-primary-cta', content.hero.primaryCtaHref, content.hero.primaryCtaLabel);
-    setText('intro-heading', content.intro.heading);
-    setText('intro-body', content.intro.body);
-    setText('services-heading', content.services.heading);
-    setText('about-heading', content.about.heading);
-    setText('about-body', content.about.body);
-    setText('contact-heading', content.contact.heading);
-    setText('contact-body', content.contact.body);
-    setLink('contact-phone', 'tel:' + String(content.contact.phone || '').replace(/\s+/g, ''), content.contact.phone);
-    setLink('contact-email', 'mailto:' + (content.contact.email || ''), content.contact.email);
-    setText('contact-address', content.contact.address);
     setText('footer-tagline', content.footer.tagline);
     setText('footer-copyright', content.footer.copyright);
 
-    renderServices(content.services.items);
     renderHeroVisual(content);
-    renderAboutVisual(content);
+    renderIntro(content);
+    renderServices(content);
+    renderAbout(content);
     renderTestimonials(content);
     renderFaq(content);
     renderGallery(content);
+    renderContact(content);
     renderSocialLinks(content);
   }
+
+  window.__contentCreatorApplyContent = applyContent;
 
   function setupNavigation() {
     if (!navToggle || !siteNavigation) {
@@ -296,7 +391,7 @@
   fetch('content/home.json')
     .then(function (response) {
       if (!response.ok) {
-        throw new Error('Kunde inte ladda innehall.');
+        throw new Error('Kunde inte ladda innehåll.');
       }
       return response.json();
     })
@@ -309,7 +404,7 @@
       if (!embeddedContent) {
         document.title = 'Kunde inte ladda webbplatsen';
         setText('hero-headline', 'Kunde inte ladda webbplatsen');
-        setText('hero-subheadline', 'Innehallsfilen kunde inte lasas in.');
+        setText('hero-subheadline', 'Innehållsfilen kunde inte läsas in.');
       }
       setupNavigation();
     });

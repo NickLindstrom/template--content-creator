@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Loading...</title>
+    <meta name="description" content="" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="sv_SE" />
+    <meta property="og:title" content="" />
+    <meta property="og:description" content="" />
+    <meta property="og:image" content="" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="" />
+    <meta name="twitter:description" content="" />
+    <meta name="twitter:image" content="" />
+    <link rel="stylesheet" href="themes/classic/main.css" />
+    <script defer src="index.js"></script>
+  </head>
+  <body class="site-body">
+    <a class="skip-link" href="#main-content">Hoppa till innehåll</a>
+    <header class="site-header">
+      <div class="site-container header-inner">
+        <a id="header-brand" class="brand-mark" href="#top" aria-label="Till startsidan"><span class="brand-mark__text">Laddar...</span></a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-navigation">Meny</button>
+        <nav id="site-navigation" class="site-navigation" aria-label="Huvudmeny">
+          <a id="services-nav-link" class="site-navigation__link" href="#services">Tjänster</a>
+          <a id="about-nav-link" class="site-navigation__link" href="#about">Om oss</a>
+          <a id="gallery-nav-link" class="site-navigation__link" href="#gallery" hidden>Bilder</a>
+          <a id="nav-cta-link" class="site-navigation__link site-navigation__link--cta" href="#contact">Kontakt</a>
+        </nav>
+      </div>
+    </header>
+    <main id="main-content">
+      <section id="top" class="hero-section">
+        <div class="site-container hero-layout">
+          <div class="hero-content">
+            <p id="hero-eyebrow" class="section-eyebrow"></p>
+            <h1 id="hero-headline" class="hero-title"></h1>
+            <p id="hero-subheadline" class="hero-text"></p>
+            <div class="hero-actions">
+              <a id="hero-primary-cta" class="button button--primary" href="#contact">Kontakta oss</a>
+              <a class="button button--secondary" href="#services">Utforska tjänster</a>
+            </div>
+          </div>
+          <div id="hero-visual-slot"></div>
+        </div>
+      </section>
+      <section id="intro-section" class="intro-section section-spacing">
+        <div class="site-container narrow-container">
+          <p class="section-eyebrow">Introduktion</p>
+          <h2 id="intro-heading" class="section-title"></h2>
+          <p id="intro-body" class="section-text"></p>
+        </div>
+      </section>
+      <section id="services" class="services-section section-spacing section-surface">
+        <div class="site-container">
+          <p class="section-eyebrow">Tjänster</p>
+          <h2 id="services-heading" class="section-title"></h2>
+          <div id="services-list" class="services-grid"></div>
+        </div>
+      </section>
+      <section id="about" class="about-section section-spacing">
+        <div class="site-container about-layout">
+          <div class="about-content">
+            <p class="section-eyebrow">Om oss</p>
+            <h2 id="about-heading" class="section-title"></h2>
+            <p id="about-body" class="section-text"></p>
+          </div>
+          <div id="about-visual-slot"></div>
+        </div>
+      </section>
+      <section id="gallery" class="gallery-section section-spacing" hidden>
+        <div class="site-container">
+          <p class="section-eyebrow">Bilder</p>
+          <h2 id="gallery-heading" class="section-title">Inblick i verksamheten</h2>
+          <div id="gallery-grid" class="gallery-grid"></div>
+        </div>
+      </section>
+      <section id="testimonials-section" class="testimonials-section section-spacing" hidden>
+        <div class="site-container">
+          <p class="section-eyebrow">Omdömen</p>
+          <h2 id="testimonials-heading" class="section-title"></h2>
+          <div id="testimonials-list" class="testimonials-grid"></div>
+        </div>
+      </section>
+      <section id="faq" class="faq-section section-spacing" hidden>
+        <div class="site-container">
+          <p class="section-eyebrow">FAQ</p>
+          <h2 id="faq-heading" class="section-title"></h2>
+          <div id="faq-list" class="faq-list"></div>
+        </div>
+      </section>
+      <section id="contact" class="contact-section section-spacing section-surface">
+        <div class="site-container contact-layout">
+          <div class="contact-content">
+            <p class="section-eyebrow">Kontakt</p>
+            <h2 id="contact-heading" class="section-title"></h2>
+            <p id="contact-body" class="section-text"></p>
+          </div>
+          <div class="contact-card">
+            <div class="contact-card__row"><span class="contact-card__label">Telefon</span><a id="contact-phone" class="contact-card__value" href="#"></a></div>
+            <div class="contact-card__row"><span class="contact-card__label">E-post</span><a id="contact-email" class="contact-card__value" href="#"></a></div>
+            <div class="contact-card__row"><span class="contact-card__label">Adress</span><span id="contact-address" class="contact-card__value"></span></div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer">
+      <div class="site-container footer-layout">
+        <div class="site-footer__brand">
+          <a id="footer-brand" class="brand-mark brand-mark--footer" href="#top" aria-label="Till startsidan"><span class="brand-mark__text">Laddar...</span></a>
+          <p id="footer-tagline" class="site-footer__text"></p>
+        </div>
+        <div id="social-links" class="site-footer__links"></div>
+      </div>
+      <div class="site-container footer-bottom-row"><p id="footer-copyright" class="footer-bottom-row__copyright"></p></div>
+    </footer>
+    <script id="initial-content" type="application/json">{"site":{"theme":"classic"}}</script>
+  </body>
+</html>

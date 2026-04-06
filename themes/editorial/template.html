@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Loading...</title>
+    <meta name="description" content="" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="sv_SE" />
+    <meta property="og:title" content="" />
+    <meta property="og:description" content="" />
+    <meta property="og:image" content="" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="" />
+    <meta name="twitter:description" content="" />
+    <meta name="twitter:image" content="" />
+    <link rel="stylesheet" href="themes/editorial/main.css" />
+    <script defer src="index.js"></script>
+  </head>
+  <body class="editorial-body">
+    <a class="skip-link" href="#main-content">Hoppa till innehåll</a>
+    <header class="editorial-header">
+      <div class="editorial-shell editorial-header__row">
+        <a id="header-brand" class="editorial-brand" href="#top" aria-label="Till startsidan"><span class="brand-mark__text">Laddar...</span></a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-navigation">Meny</button>
+        <nav id="site-navigation" class="editorial-nav" aria-label="Huvudmeny">
+          <a id="services-nav-link" class="editorial-nav__link" href="#services">Tjänster</a>
+          <a id="about-nav-link" class="editorial-nav__link" href="#about">Om oss</a>
+          <a id="gallery-nav-link" class="editorial-nav__link" href="#gallery" hidden>Galleri</a>
+          <a id="nav-cta-link" class="editorial-nav__link editorial-nav__link--cta" href="#contact">Kontakt</a>
+        </nav>
+      </div>
+    </header>
+    <main id="main-content">
+      <section id="top" class="editorial-hero">
+        <div class="editorial-shell editorial-hero__layout">
+          <div class="editorial-hero__visual-stage"><div id="hero-visual-slot"></div></div>
+          <div class="editorial-hero__copy">
+            <p id="hero-eyebrow" class="editorial-kicker"></p>
+            <h1 id="hero-headline" class="editorial-display"></h1>
+            <p id="hero-subheadline" class="editorial-lead"></p>
+            <div class="editorial-actions">
+              <a id="hero-primary-cta" class="editorial-button editorial-button--primary" href="#contact">Kontakta oss</a>
+              <a class="editorial-button editorial-button--secondary" href="#about">Lär känna oss</a>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="intro-section" class="editorial-intro">
+        <div class="editorial-shell editorial-intro__inner">
+          <p class="editorial-kicker">Introduktion</p>
+          <h2 id="intro-heading" class="editorial-title"></h2>
+          <p id="intro-body" class="editorial-copy"></p>
+        </div>
+      </section>
+      <section id="services" class="editorial-section editorial-section--contrast">
+        <div class="editorial-shell">
+          <div class="editorial-section__header"><p class="editorial-kicker">Tjänster</p><h2 id="services-heading" class="editorial-title"></h2></div>
+          <div id="services-list" class="editorial-services"></div>
+        </div>
+      </section>
+      <section id="about" class="editorial-section editorial-section--split">
+        <div class="editorial-shell editorial-split">
+          <div class="editorial-split__content"><p class="editorial-kicker">Om oss</p><h2 id="about-heading" class="editorial-title"></h2><p id="about-body" class="editorial-copy"></p></div>
+          <div id="about-visual-slot" class="editorial-split__visual"></div>
+        </div>
+      </section>
+      <section id="gallery" class="editorial-section editorial-gallery" hidden>
+        <div class="editorial-shell"><div class="editorial-section__header"><p class="editorial-kicker">Galleri</p><h2 id="gallery-heading" class="editorial-title"></h2></div><div id="gallery-grid" class="editorial-gallery__grid"></div></div>
+      </section>
+      <section id="testimonials-section" class="editorial-section" hidden>
+        <div class="editorial-shell"><div class="editorial-section__header"><p class="editorial-kicker">Omdömen</p><h2 id="testimonials-heading" class="editorial-title"></h2></div><div id="testimonials-list" class="editorial-testimonials"></div></div>
+      </section>
+      <section id="faq" class="editorial-section editorial-section--contrast" hidden>
+        <div class="editorial-shell"><div class="editorial-section__header"><p class="editorial-kicker">Frågor och svar</p><h2 id="faq-heading" class="editorial-title"></h2></div><div id="faq-list" class="editorial-faq"></div></div>
+      </section>
+      <section id="contact" class="editorial-section editorial-contact">
+        <div class="editorial-shell editorial-contact__layout">
+          <div><p class="editorial-kicker">Kontakt</p><h2 id="contact-heading" class="editorial-title"></h2><p id="contact-body" class="editorial-copy"></p></div>
+          <div class="editorial-contact__card">
+            <div class="editorial-contact__row"><span>Telefon</span><a id="contact-phone" href="#"></a></div>
+            <div class="editorial-contact__row"><span>E-post</span><a id="contact-email" href="#"></a></div>
+            <div class="editorial-contact__row"><span>Adress</span><span id="contact-address"></span></div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="editorial-footer">
+      <div class="editorial-shell editorial-footer__layout">
+        <a id="footer-brand" class="editorial-brand editorial-brand--footer" href="#top" aria-label="Till startsidan"><span class="brand-mark__text">Laddar...</span></a>
+        <p id="footer-tagline" class="editorial-footer__tagline"></p>
+        <div id="social-links" class="editorial-footer__links"></div>
+      </div>
+      <div class="editorial-shell editorial-footer__bottom"><p id="footer-copyright"></p></div>
+    </footer>
+    <script id="initial-content" type="application/json">{"site":{"theme":"editorial"}}</script>
+  </body>
+</html>

@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="sv" data-theme-mode="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Loading...</title>
+    <meta name="description" content="" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="sv_SE" />
+    <meta property="og:title" content="" />
+    <meta property="og:description" content="" />
+    <meta property="og:image" content="" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="" />
+    <meta name="twitter:description" content="" />
+    <meta name="twitter:image" content="" />
+    <link rel="stylesheet" href="themes/showcase/main.css" />
+    <script defer src="index.js"></script>
+  </head>
+  <body class="showcase-body" data-theme-mode="light">
+    <a class="skip-link" href="#main-content">Hoppa till innehåll</a>
+
+    <header class="showcase-header">
+      <div class="showcase-shell showcase-header__row">
+        <a id="header-brand" class="showcase-brand" href="#top" aria-label="Till startsidan">
+          <span class="brand-mark__text">Laddar...</span>
+        </a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-navigation">Meny</button>
+        <nav id="site-navigation" class="showcase-nav" aria-label="Huvudmeny">
+          <a id="services-nav-link" class="showcase-nav__link" href="#services">Tjänster</a>
+          <a id="about-nav-link" class="showcase-nav__link" href="#about">Om oss</a>
+          <a id="gallery-nav-link" class="showcase-nav__link" href="#gallery" hidden>Galleri</a>
+        </nav>
+        <a id="nav-cta-link" class="showcase-nav__cta" href="#contact">Kontakt</a>
+      </div>
+    </header>
+
+    <main id="main-content" class="showcase-main">
+      <section id="top" class="showcase-hero">
+        <div class="showcase-shell showcase-hero__media-wrap">
+          <div id="hero-visual-slot" class="showcase-hero__media"></div>
+          <div class="showcase-hero__overlay">
+            <p id="hero-eyebrow" class="showcase-label"></p>
+            <h1 id="hero-headline" class="showcase-hero__title"></h1>
+            <p id="hero-subheadline" class="showcase-hero__body"></p>
+            <a id="hero-primary-cta" class="showcase-button showcase-button--accent" href="#contact">Kontakta oss</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="intro-section" class="showcase-intro">
+        <div class="showcase-shell showcase-intro__inner">
+          <p class="showcase-label">Introduktion</p>
+          <h2 id="intro-heading" class="showcase-section__title"></h2>
+          <p id="intro-body" class="showcase-copy"></p>
+        </div>
+      </section>
+
+      <section id="about" class="showcase-section showcase-section--about">
+        <div class="showcase-shell showcase-about__layout">
+          <div class="showcase-about__content">
+            <p class="showcase-label">Om oss</p>
+            <h2 id="about-heading" class="showcase-section__title"></h2>
+            <p id="about-body" class="showcase-copy"></p>
+            <a class="showcase-button showcase-button--secondary" href="#contact">Kontakta oss</a>
+          </div>
+          <div id="about-visual-slot" class="showcase-about__visual"></div>
+        </div>
+      </section>
+
+      <section id="gallery" class="showcase-section showcase-section--gallery" hidden>
+        <div class="showcase-shell">
+          <div class="showcase-section__header showcase-section__header--compact">
+            <p class="showcase-label">Galleri</p>
+            <h2 id="gallery-heading" class="showcase-section__title"></h2>
+          </div>
+          <div id="gallery-grid" class="showcase-gallery"></div>
+          <div class="showcase-gallery__cta-row">
+            <a class="showcase-button showcase-button--secondary" href="#contact">Kontakta oss</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="services" class="showcase-section showcase-section--services">
+        <div class="showcase-shell">
+          <div class="showcase-section__header showcase-section__header--compact">
+            <p class="showcase-label">Tjänster</p>
+            <h2 id="services-heading" class="showcase-section__title"></h2>
+          </div>
+          <div id="services-list" class="showcase-services"></div>
+        </div>
+      </section>
+
+      <section id="faq" class="showcase-section showcase-section--faq" hidden>
+        <div class="showcase-shell">
+          <div class="showcase-section__header showcase-section__header--compact">
+            <p class="showcase-label">Frågor och svar</p>
+            <h2 id="faq-heading" class="showcase-section__title"></h2>
+          </div>
+          <div id="faq-list" class="showcase-faq"></div>
+        </div>
+      </section>
+
+      <section id="testimonials-section" class="showcase-section showcase-section--testimonials" hidden>
+        <div class="showcase-shell">
+          <div class="showcase-section__header showcase-section__header--compact">
+            <p class="showcase-label">Omdömen</p>
+            <h2 id="testimonials-heading" class="showcase-section__title"></h2>
+          </div>
+          <div id="testimonials-list" class="showcase-testimonials"></div>
+        </div>
+      </section>
+
+      <section id="contact" class="showcase-section showcase-section--contact">
+        <div class="showcase-shell showcase-contact__layout">
+          <div class="showcase-contact__content">
+            <p class="showcase-label">Kontakt</p>
+            <h2 id="contact-heading" class="showcase-section__title"></h2>
+            <p id="contact-body" class="showcase-copy"></p>
+            <a class="showcase-button showcase-button--accent" href="#contact">Kontakta oss</a>
+          </div>
+          <div class="showcase-contact__card">
+            <div class="showcase-contact__row"><span>Telefon</span><a id="contact-phone" href="#"></a></div>
+            <div class="showcase-contact__row"><span>E-post</span><a id="contact-email" href="#"></a></div>
+            <div class="showcase-contact__row"><span>Adress</span><span id="contact-address"></span></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="showcase-footer">
+      <div class="showcase-shell showcase-footer__inner">
+        <a id="footer-brand" class="showcase-footer__brand" href="#top" aria-label="Till startsidan">
+          <span class="brand-mark__text">Laddar...</span>
+        </a>
+        <p id="footer-tagline" class="showcase-footer__title"></p>
+        <div id="social-links" class="showcase-footer__socials"></div>
+        <p id="footer-copyright" class="showcase-footer__copyright"></p>
+      </div>
+    </footer>
+
+    <script id="initial-content" type="application/json">{"site":{"theme":"showcase","themeMode":"light"}}</script>
+  </body>
+</html>
