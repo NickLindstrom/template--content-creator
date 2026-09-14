@@ -43,6 +43,12 @@
     }
   }
 
+  function setMediaSettings(content) {
+    var media = content.media || {};
+    var imageRatio = hasText(media.imageRatio) ? media.imageRatio : '4 / 3';
+    document.documentElement.style.setProperty('--content-image-ratio', imageRatio);
+  }
+
   function setHidden(id, hidden) {
     var element = document.getElementById(id);
     if (element) {
@@ -86,24 +92,32 @@
     }
   }
 
-  function createBrand(elementId, companyName, logoUrl) {
+  function createBrand(elementId, companyName, logoUrl, options) {
     var element = document.getElementById(elementId);
     if (!element) return;
 
+    var settings = options || {};
     element.innerHTML = '';
+    element.classList.toggle('brand-mark--logo-only', Boolean(settings.logoOnly && logoUrl));
 
     if (logoUrl) {
       var logo = document.createElement('img');
       logo.className = 'brand-mark__logo';
       logo.src = logoUrl;
       logo.alt = companyName + ' logotyp';
+      if (hasText(settings.logoWidth)) {
+        logo.style.width = settings.logoWidth;
+        logo.style.height = 'auto';
+      }
       element.appendChild(logo);
     }
 
-    var text = document.createElement('span');
-    text.className = 'brand-mark__text';
-    text.textContent = companyName || '';
-    element.appendChild(text);
+    if (!settings.logoOnly || !logoUrl) {
+      var text = document.createElement('span');
+      text.className = 'brand-mark__text';
+      text.textContent = companyName || '';
+      element.appendChild(text);
+    }
   }
 
   function renderServices(content) {
@@ -123,10 +137,13 @@
 
     setText('services-heading', content.services.heading);
     items.forEach(function (item) {
+      var image = item.image && item.image.url
+        ? '<img class="service-card__image" src="' + escapeHtml(item.image.url) + '" alt="' + escapeHtml(item.image.alt || item.title || '') + '">'
+        : '';
       var article = document.createElement('article');
       article.className = 'service-card';
       article.innerHTML = [
-        '<div class="service-card__media"><span class="service-card__badge">Tjänst</span></div>',
+        '<div class="service-card__media' + (image ? ' service-card__media--image' : '') + '">' + image + '<span class="service-card__badge">Tjänst</span></div>',
         '<h3 class="service-card__title">' + escapeHtml(item.title) + '</h3>',
         '<p class="service-card__text">' + escapeHtml(item.description) + '</p>'
       ].join('');
@@ -343,9 +360,15 @@
 
   function applyContent(content) {
     setThemeMode(content.site && content.site.themeMode);
+    setMediaSettings(content);
     applySeo(content);
-    createBrand('header-brand', content.site.displayName, content.media && content.media.logoUrl);
-    createBrand('footer-brand', content.footer.companyName, content.media && content.media.logoUrl);
+    createBrand('header-brand', content.site.displayName, content.media && content.media.logoUrl, {
+      logoOnly: Boolean(content.media && content.media.headerLogoOnly),
+      logoWidth: content.media && content.media.logoWidth
+    });
+    createBrand('footer-brand', content.footer.companyName, content.media && content.media.logoUrl, {
+      logoWidth: content.media && content.media.logoWidth
+    });
     setText('hero-eyebrow', content.hero.eyebrow);
     setText('hero-headline', content.hero.headline);
     setText('hero-subheadline', content.hero.subheadline);

@@ -7,6 +7,7 @@
   --editorial-accent: #8d3b2f;
   --editorial-accent-soft: #d6a36b;
   --editorial-shadow: rgba(31, 26, 23, 0.12);
+  --content-image-ratio: 4 / 3;
   --editorial-width: 1180px;
   --editorial-radius: 26px;
 }
@@ -27,7 +28,8 @@ a { color: inherit; text-decoration: none; }
 .editorial-header { position: sticky; top: 0; z-index: 20; background: rgba(251, 248, 242, 0.88); backdrop-filter: blur(16px); border-bottom: 1px solid var(--editorial-border); }
 .editorial-header__row { min-height: 88px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .editorial-brand, .brand-mark { display: inline-flex; align-items: center; gap: 0.85rem; font-family: Arial, sans-serif; font-weight: 800; }
-.brand-mark__logo { width: 42px; height: 42px; }
+.brand-mark__logo { width: 42px; height: auto; }
+.brand-mark--logo-only { gap: 0; }
 .editorial-brand--footer { color: #fff; }
 .nav-toggle { display: none; border: 1px solid var(--editorial-border); background: white; border-radius: 999px; padding: 0.8rem 1rem; cursor: pointer; }
 .editorial-nav { display: flex; align-items: center; gap: 1rem; }
@@ -52,12 +54,15 @@ a { color: inherit; text-decoration: none; }
 .editorial-services, .editorial-testimonials, .editorial-gallery__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.4rem; }
 .editorial-faq { display: grid; gap: 1rem; }
 .service-card, .testimonial-card, .faq-item { padding: 1.4rem; }
-.service-card__media { height: 160px; margin-bottom: 1rem; border-radius: 20px; background: linear-gradient(135deg, rgba(141, 59, 47, 0.12), rgba(214, 163, 107, 0.24)), url('../../assets/detail-pattern.svg') center/cover no-repeat; }
+.service-card__media { position: relative; height: 160px; margin-bottom: 1rem; border-radius: 20px; overflow: hidden; background: linear-gradient(135deg, rgba(141, 59, 47, 0.12), rgba(214, 163, 107, 0.24)), url('../../assets/detail-pattern.svg') center/cover no-repeat; }
+.service-card__image { width: 100%; height: 100%; object-fit: cover; }
+.service-card__media--image .service-card__badge { position: absolute; left: 1rem; top: 1rem; }
 .service-card__badge, .hero-visual__label, .highlight-panel__label { margin: 0; font: 700 0.78rem/1 Arial, sans-serif; letter-spacing: 0.12em; text-transform: uppercase; color: var(--editorial-accent); }
 .service-card__title, .testimonial-card__name, .faq-item__question { margin: 0; font-size: 1.15rem; }
 .editorial-split, .editorial-contact__layout { display: grid; grid-template-columns: 0.95fr 1.05fr; gap: 2rem; align-items: start; }
 .about-media { display: grid; gap: 1.25rem; }
 .about-media__image-frame, .hero-visual__main-card, .gallery-card { overflow: hidden; }
+.about-media__image-frame, .hero-visual__main-card, .gallery-card { aspect-ratio: var(--content-image-ratio); }
 .about-media__image, .hero-visual__image, .gallery-card__image { width: 100%; height: 100%; object-fit: cover; }
 .highlight-panel, .editorial-contact__card { padding: 1.6rem; }
 .usp-list { list-style: none; margin: 1rem 0 0; padding: 0; display: grid; gap: 0.8rem; }
@@ -65,7 +70,7 @@ a { color: inherit; text-decoration: none; }
 .usp-list__item::before { content: '•'; position: absolute; left: 0; color: var(--editorial-accent-soft); font-weight: 900; }
 .editorial-gallery__grid { margin-top: 0.5rem; }
 .gallery-card { margin: 0; background: rgba(255,255,255,0.72); }
-.gallery-card__image { aspect-ratio: 4 / 3; }
+.gallery-card__image { aspect-ratio: var(--content-image-ratio); }
 .editorial-contact__card { display: grid; gap: 1rem; }
 .editorial-contact__row { display: grid; gap: 0.25rem; }
 .editorial-contact__row a, .editorial-contact__row span:last-child { color: var(--editorial-ink); }

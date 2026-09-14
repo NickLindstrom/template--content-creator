@@ -12,6 +12,7 @@
   --accent-deep: #ff7a00;
   --shadow: 0 22px 70px rgba(0, 0, 0, 0.5);
   --glow: 0 0 22px rgba(255, 176, 42, 0.35);
+  --content-image-ratio: 4 / 3;
   --radius: 28px;
   --shell: 1180px;
   --header-height: 88px;
@@ -171,9 +172,13 @@ img {
 
 .brand-mark__logo {
   width: 58px;
-  height: 58px;
+  height: auto;
   object-fit: contain;
   filter: drop-shadow(0 0 16px rgba(255, 186, 51, 0.34));
+}
+
+.brand-mark--logo-only {
+  gap: 0;
 }
 
 .brand-mark__text {
@@ -587,6 +592,7 @@ img {
 .gallery-card__image {
   width: 100%;
   height: 100%;
+  aspect-ratio: var(--content-image-ratio);
   min-height: 160px;
   object-fit: cover;
   transition: transform 220ms ease, opacity 220ms ease;
@@ -622,6 +628,20 @@ img {
   overflow: hidden;
 }
 
+.service-card__image {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.service-card__media--image::before,
+.service-card__media--image::after {
+  display: none;
+}
+
 .service-card__media::before,
 .service-card__media::after {
   content: "";
@@ -650,6 +670,7 @@ img {
   position: absolute;
   left: 1rem;
   top: 1rem;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   padding: 0.5rem 0.75rem;
