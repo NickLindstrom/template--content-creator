@@ -21,7 +21,9 @@ function escapeHtml(value) {
 }
 
 function get(obj, keyPath) {
-  return keyPath.split(".").reduce((acc, key) => (acc && acc[key] != null ? acc[key] : ""), obj);
+  return keyPath
+    .split(".")
+    .reduce((acc, key) => (acc && acc[key] != null ? acc[key] : ""), obj);
 }
 
 function localeFromLanguage(language) {
@@ -33,14 +35,17 @@ function listGeneratedAssetUrls() {
     return [];
   }
 
-  return fs.readdirSync(generatedAssetsDir)
+  return fs
+    .readdirSync(generatedAssetsDir)
     .filter((name) => fs.statSync(path.join(generatedAssetsDir, name)).isFile())
     .sort()
     .map((name) => `assets/generated/${name}`);
 }
 
 function firstMatchingAsset(assetUrls, matcher) {
-  return assetUrls.find((url) => matcher(path.basename(url).toLowerCase())) || "";
+  return (
+    assetUrls.find((url) => matcher(path.basename(url).toLowerCase())) || ""
+  );
 }
 
 function hasNonEmptyUrl(value) {
@@ -51,53 +56,80 @@ function resolveMedia(content) {
   const assetUrls = listGeneratedAssetUrls();
   const configuredMedia = content.media || {};
 
-  const generatedLogoUrl = firstMatchingAsset(assetUrls, (name) => name.includes("-logo."));
-  const generatedHeroUrl = firstMatchingAsset(assetUrls, (name) => name.includes("-ai-hero."));
-  const generatedAboutUrl = firstMatchingAsset(assetUrls, (name) => name.includes("-ai-about."));
-  const generatedUserUrls = assetUrls.filter((url) => path.basename(url).toLowerCase().includes("-user-"));
+  const generatedLogoUrl = firstMatchingAsset(assetUrls, (name) =>
+    name.includes("-logo."),
+  );
+  const generatedHeroUrl = firstMatchingAsset(assetUrls, (name) =>
+    name.includes("-ai-hero."),
+  );
+  const generatedAboutUrl = firstMatchingAsset(assetUrls, (name) =>
+    name.includes("-ai-about."),
+  );
+  const generatedUserUrls = assetUrls.filter((url) =>
+    path.basename(url).toLowerCase().includes("-user-"),
+  );
 
-  const logoUrl = generatedLogoUrl || (hasNonEmptyUrl(configuredMedia.logoUrl) ? configuredMedia.logoUrl : "");
+  const logoUrl =
+    generatedLogoUrl ||
+    (hasNonEmptyUrl(configuredMedia.logoUrl) ? configuredMedia.logoUrl : "");
   const heroImageUrl =
     generatedUserUrls[0] ||
     generatedHeroUrl ||
-    (hasNonEmptyUrl(configuredMedia.heroImage?.url) ? configuredMedia.heroImage.url : "");
+    (hasNonEmptyUrl(configuredMedia.heroImage?.url)
+      ? configuredMedia.heroImage.url
+      : "");
   const aboutImageUrl =
     generatedUserUrls[1] ||
     generatedAboutUrl ||
     generatedUserUrls[0] ||
-    (hasNonEmptyUrl(configuredMedia.aboutImage?.url) ? configuredMedia.aboutImage.url : "");
+    (hasNonEmptyUrl(configuredMedia.aboutImage?.url)
+      ? configuredMedia.aboutImage.url
+      : "");
 
-  const reserved = new Set([logoUrl, heroImageUrl, aboutImageUrl].filter(Boolean));
+  const reserved = new Set(
+    [logoUrl, heroImageUrl, aboutImageUrl].filter(Boolean),
+  );
 
   const generatedGalleryUrls = assetUrls.filter((url) => !reserved.has(url));
-  const configuredGallery = Array.isArray(configuredMedia.gallery) ? configuredMedia.gallery : [];
+  const configuredGallery = Array.isArray(configuredMedia.gallery)
+    ? configuredMedia.gallery
+    : [];
   const configuredGalleryItems = configuredGallery
-    .filter((item) => item && hasNonEmptyUrl(item.url) && !reserved.has(item.url))
+    .filter(
+      (item) => item && hasNonEmptyUrl(item.url) && !reserved.has(item.url),
+    )
     .map((item) => ({
       url: item.url,
-      alt: item.alt || `${content.site.displayName} bild`
+      alt: item.alt || `${content.site.displayName} bild`,
     }));
 
   const generatedGalleryItems = generatedGalleryUrls.map((url, index) => ({
     url,
-    alt: `${content.site.displayName} bild ${index + 1}`
+    alt: `${content.site.displayName} bild ${index + 1}`,
   }));
 
   return {
     logoUrl: logoUrl || null,
     heroImage: heroImageUrl
       ? {
-        url: heroImageUrl,
-        alt: configuredMedia.heroImage?.alt || `${content.site.displayName} hero-bild`
-      }
+          url: heroImageUrl,
+          alt:
+            configuredMedia.heroImage?.alt ||
+            `${content.site.displayName} hero-bild`,
+        }
       : null,
     aboutImage: aboutImageUrl
       ? {
-        url: aboutImageUrl,
-        alt: configuredMedia.aboutImage?.alt || `${content.site.displayName} verksamhetsbild`
-      }
+          url: aboutImageUrl,
+          alt:
+            configuredMedia.aboutImage?.alt ||
+            `${content.site.displayName} verksamhetsbild`,
+        }
       : null,
-    gallery: generatedGalleryItems.length > 0 ? generatedGalleryItems : configuredGalleryItems
+    gallery:
+      generatedGalleryItems.length > 0
+        ? generatedGalleryItems
+        : configuredGalleryItems,
   };
 }
 
@@ -111,15 +143,16 @@ function renderBrand({ companyName, logoUrl, className }) {
 
 function renderServices(items) {
   return (items || [])
-    .map((item) => `
+    .map(
+      (item) => `
     <article class="service-card">
       <div class="service-card__media">
-        <span class="service-card__badge">Tjanst</span>
       </div>
       <h3 class="service-card__title">${escapeHtml(item.title)}</h3>
       <p class="service-card__text">${escapeHtml(item.description)}</p>
     </article>
-  `)
+  `,
+    )
     .join("");
 }
 
@@ -133,12 +166,14 @@ function renderTestimonials(testimonials) {
   if (!testimonials?.enabled) return "";
 
   const cards = (testimonials.items || [])
-    .map((item) => `
+    .map(
+      (item) => `
     <article class="testimonial-card">
       <h3 class="testimonial-card__name">${escapeHtml(item.name)}</h3>
       <p class="testimonial-card__text">"${escapeHtml(item.quote)}"</p>
     </article>
-  `)
+  `,
+    )
     .join("");
 
   if (!cards) return "";
@@ -158,12 +193,14 @@ function renderFaq(faq) {
   if (!faq?.enabled) return "";
 
   const items = (faq.items || [])
-    .map((item) => `
+    .map(
+      (item) => `
     <article class="faq-item">
       <h3 class="faq-item__question">${escapeHtml(item.question)}</h3>
       <p class="faq-item__answer">${escapeHtml(item.answer)}</p>
     </article>
-  `)
+  `,
+    )
     .join("");
 
   if (!items) return "";
@@ -188,7 +225,7 @@ function renderSocialLinks(links) {
   return entries
     .map(
       ([key, url]) =>
-        `<a class="site-footer__social-link" href="${escapeHtml(url)}" target="_blank" rel="noreferrer">${escapeHtml(key)}</a>`
+        `<a class="site-footer__social-link" href="${escapeHtml(url)}" target="_blank" rel="noreferrer">${escapeHtml(key)}</a>`,
     )
     .join("");
 }
@@ -204,7 +241,7 @@ function renderGallery(gallery) {
       <figure class="gallery-card">
         <img class="gallery-card__image" src="${escapeHtml(item.url)}" alt="${escapeHtml(item.alt)}">
       </figure>
-    `
+    `,
     )
     .join("");
 
@@ -267,39 +304,58 @@ function renderPage(content) {
     ...content,
     media: resolvedMedia,
     og: {
-      locale: localeFromLanguage(content.site.language)
+      locale: localeFromLanguage(content.site.language),
     },
     contact: {
       ...content.contact,
-      phoneRaw: String(content.contact.phone || "").replace(/\s+/g, "")
+      phoneRaw: String(content.contact.phone || "").replace(/\s+/g, ""),
     },
     seo: {
       ...content.seo,
-      ogImage: resolvedMedia.heroImage?.url || ""
-    }
+      ogImage: resolvedMedia.heroImage?.url || "",
+    },
   };
 
   let html = template
-    .replace("{{headerBrand}}", renderBrand({
-      companyName: content.site.displayName,
-      logoUrl: resolvedMedia.logoUrl,
-      className: "brand-mark"
-    }))
-    .replace("{{footerBrand}}", renderBrand({
-      companyName: content.footer.companyName,
-      logoUrl: resolvedMedia.logoUrl,
-      className: "brand-mark brand-mark--footer"
-    }))
-    .replace("{{galleryNavLink}}", resolvedMedia.gallery.length > 0 ? '<a class="site-navigation__link" href="#gallery">Bilder</a>' : "")
+    .replace(
+      "{{headerBrand}}",
+      renderBrand({
+        companyName: content.site.displayName,
+        logoUrl: resolvedMedia.logoUrl,
+        className: "brand-mark",
+      }),
+    )
+    .replace(
+      "{{footerBrand}}",
+      renderBrand({
+        companyName: content.footer.companyName,
+        logoUrl: resolvedMedia.logoUrl,
+        className: "brand-mark brand-mark--footer",
+      }),
+    )
+    .replace(
+      "{{galleryNavLink}}",
+      resolvedMedia.gallery.length > 0
+        ? '<a class="site-navigation__link" href="#gallery">Bilder</a>'
+        : "",
+    )
     .replace("{{servicesList}}", renderServices(content.services.items))
-    .replace("{{heroVisual}}", renderHeroVisual(resolvedMedia, content.site, content.contact))
+    .replace(
+      "{{heroVisual}}",
+      renderHeroVisual(resolvedMedia, content.site, content.contact),
+    )
     .replace("{{aboutVisual}}", renderAboutVisual(resolvedMedia, content.usp))
     .replace("{{gallerySection}}", renderGallery(resolvedMedia.gallery))
-    .replace("{{testimonialsSection}}", renderTestimonials(content.testimonials))
+    .replace(
+      "{{testimonialsSection}}",
+      renderTestimonials(content.testimonials),
+    )
     .replace("{{faqSection}}", renderFaq(content.faq))
     .replace("{{socialLinks}}", renderSocialLinks(content.footer.socialLinks));
 
-  html = html.replace(/{{\s*([\w.]+)\s*}}/g, (_, keyPath) => escapeHtml(get(enriched, keyPath)));
+  html = html.replace(/{{\s*([\w.]+)\s*}}/g, (_, keyPath) =>
+    escapeHtml(get(enriched, keyPath)),
+  );
   return html;
 }
 

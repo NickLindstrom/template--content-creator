@@ -12,6 +12,11 @@
     --color-accent: #e5a53d;
     --color-shadow: rgba(23, 32, 51, 0.12);
     --content-image-ratio: 4 / 3;
+    --font-heading: Georgia, "Times New Roman", serif;
+    --font-body: Arial, sans-serif;
+    --site-header-bg: rgba(252, 251, 247, 0.82);
+    --site-main-bg: transparent;
+    --site-footer-bg: var(--color-secondary);
     --container-width: 1140px;
     --radius-large: 28px;
     --radius-medium: 18px;
@@ -28,7 +33,7 @@ html {
 
 body {
     margin: 0;
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: var(--font-body);
     background:
         radial-gradient(circle at top left, rgba(18, 84, 197, 0.08), transparent 30%),
         linear-gradient(180deg, #fcfbf7 0%, var(--color-background) 100%);
@@ -91,6 +96,7 @@ a {
 
 .section-title {
     margin: 0;
+    font-family: var(--font-heading);
     font-size: clamp(2.1rem, 3vw, 3.4rem);
     line-height: 1.05;
 }
@@ -105,9 +111,13 @@ a {
     position: sticky;
     top: 0;
     z-index: 20;
-    background: rgba(252, 251, 247, 0.82);
+    background: var(--site-header-bg);
     backdrop-filter: blur(16px);
     border-bottom: 1px solid rgba(23, 32, 51, 0.08);
+}
+
+#main-content {
+    background: var(--site-main-bg);
 }
 
 .header-inner {
@@ -192,6 +202,7 @@ a {
 
 .hero-title {
     margin: 0;
+    font-family: var(--font-heading);
     font-size: clamp(3rem, 5vw, 5.4rem);
     line-height: 0.95;
     letter-spacing: -0.04em;
@@ -282,8 +293,7 @@ a {
 
 .hero-visual__label,
 .highlight-panel__label,
-.contact-card__label,
-.service-card__badge {
+.contact-card__label {
     margin: 0;
     font-family: Arial, sans-serif;
     font-size: 0.78rem;
@@ -374,12 +384,6 @@ a {
     object-fit: cover;
 }
 
-.service-card__media--image .service-card__badge {
-    position: absolute;
-    left: 1rem;
-    top: 1rem;
-}
-
 .service-card__title,
 .testimonial-card__name,
 .faq-item__question {
@@ -426,8 +430,7 @@ a {
 
 .site-footer {
     padding: 2rem 0 1rem;
-    background:
-        linear-gradient(180deg, color-mix(in srgb, var(--color-secondary) 92%, #ffffff) 0%, var(--color-secondary) 100%);
+    background: var(--site-footer-bg);
     color: #ffffff;
 }
 

@@ -19,6 +19,11 @@
   --header-height: 88px;
   --serif: "Georgia", "Times New Roman", serif;
   --sans: "Segoe UI", "Arial", sans-serif;
+  --font-heading: var(--serif);
+  --font-body: var(--sans);
+  --site-header-bg: linear-gradient(180deg, rgba(10, 7, 4, 0.94), rgba(10, 7, 4, 0.58));
+  --site-main-bg: transparent;
+  --site-footer-bg: transparent;
 }
 
 *,
@@ -35,7 +40,7 @@ body.showcase-body {
   margin: 0;
   min-height: 100vh;
   color: var(--text);
-  font-family: var(--sans);
+  font-family: var(--font-body);
   background:
     radial-gradient(circle at 50% 16%, rgba(255, 170, 25, 0.34), transparent 24%),
     radial-gradient(circle at 85% 62%, rgba(255, 132, 0, 0.2), transparent 18%),
@@ -111,7 +116,7 @@ img {
   top: 0;
   z-index: 30;
   backdrop-filter: blur(16px);
-  background: linear-gradient(180deg, rgba(10, 7, 4, 0.94), rgba(10, 7, 4, 0.58));
+  background: var(--site-header-bg);
   border-bottom: 1px solid rgba(255, 166, 39, 0.12);
 }
 
@@ -200,6 +205,7 @@ img {
 
 #main-content {
   display: block;
+  background: var(--site-main-bg);
 }
 
 .showcase-hero,
@@ -258,7 +264,7 @@ img {
 }
 
 .showcase-display {
-  font-family: var(--serif);
+  font-family: var(--font-heading);
   font-size: clamp(3.5rem, 11vw, 7.8rem);
   line-height: 0.95;
   font-weight: 900;
@@ -270,6 +276,7 @@ img {
 }
 
 .showcase-title {
+  font-family: var(--font-heading);
   font-size: clamp(1.8rem, 4.5vw, 3.3rem);
   line-height: 1.02;
   font-weight: 900;
@@ -581,7 +588,7 @@ img {
   gap: 1rem;
 }
 
-.showcase-gallery__grid > *:first-child {
+.showcase-gallery__grid>*:first-child {
   grid-row: span 2;
 }
 
@@ -667,24 +674,6 @@ img {
   background: linear-gradient(90deg, var(--accent), transparent);
 }
 
-.service-card__badge {
-  position: absolute;
-  left: 1rem;
-  top: 1rem;
-  z-index: 1;
-  display: inline-flex;
-  align-items: center;
-  padding: 0.5rem 0.75rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 184, 57, 0.24);
-  background: rgba(6, 4, 2, 0.72);
-  color: var(--accent);
-  font-size: 0.74rem;
-  font-weight: 800;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-
 .service-card__title,
 .testimonial-card__name,
 .faq-item__question {
@@ -733,6 +722,7 @@ img {
 
 .showcase-footer {
   padding: clamp(4rem, 8vw, 6rem) 0 2.6rem;
+  background: var(--site-footer-bg);
 }
 
 .showcase-footer__layout {
@@ -852,7 +842,7 @@ img {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .showcase-gallery__grid > *:first-child {
+  .showcase-gallery__grid>*:first-child {
     grid-column: span 2;
     grid-row: span 1;
   }
@@ -933,7 +923,7 @@ img {
     grid-template-columns: 1fr;
   }
 
-  .showcase-gallery__grid > *:first-child {
+  .showcase-gallery__grid>*:first-child {
     grid-column: auto;
   }
 
