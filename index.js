@@ -43,10 +43,26 @@
     }
   }
 
-  function setMediaSettings(content) {
+  function setDesignSettings(content) {
+    var site = content.site || {};
     var media = content.media || {};
     var imageRatio = hasText(media.imageRatio) ? media.imageRatio : '4 / 3';
     document.documentElement.style.setProperty('--content-image-ratio', imageRatio);
+
+    if (hasText(site.primaryColor)) {
+      document.documentElement.style.setProperty('--color-primary', site.primaryColor);
+      document.documentElement.style.setProperty('--color-primary-dark', site.primaryColor);
+      document.documentElement.style.setProperty('--editorial-accent', site.primaryColor);
+      document.documentElement.style.setProperty('--accent', site.primaryColor);
+      document.documentElement.style.setProperty('--accent-deep', site.primaryColor);
+    }
+
+    if (hasText(site.secondaryColor)) {
+      document.documentElement.style.setProperty('--color-secondary', site.secondaryColor);
+      document.documentElement.style.setProperty('--color-accent', site.secondaryColor);
+      document.documentElement.style.setProperty('--editorial-accent-soft', site.secondaryColor);
+      document.documentElement.style.setProperty('--accent-strong', site.secondaryColor);
+    }
   }
 
   function setHidden(id, hidden) {
@@ -360,7 +376,7 @@
 
   function applyContent(content) {
     setThemeMode(content.site && content.site.themeMode);
-    setMediaSettings(content);
+    setDesignSettings(content);
     applySeo(content);
     createBrand('header-brand', content.site.displayName, content.media && content.media.logoUrl, {
       logoOnly: Boolean(content.media && content.media.headerLogoOnly),

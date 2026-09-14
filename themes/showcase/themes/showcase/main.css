@@ -10,6 +10,7 @@
   --accent: #ffb22c;
   --accent-strong: #ffdc6d;
   --accent-deep: #ff7a00;
+  --color-secondary: #ffdc6d;
   --shadow: 0 22px 70px rgba(0, 0, 0, 0.5);
   --glow: 0 0 22px rgba(255, 176, 42, 0.35);
   --content-image-ratio: 4 / 3;
@@ -146,7 +147,7 @@ img {
 
 .showcase-nav__link--cta {
   padding: 0.95rem 1.5rem;
-  border: 1px solid var(--line-strong);
+  border: 1px solid var(--accent-strong);
   border-radius: 10px;
   background:
     linear-gradient(180deg, rgba(255, 183, 54, 0.15), rgba(255, 134, 15, 0.06)),
@@ -401,7 +402,7 @@ img {
   justify-content: center;
   min-width: 220px;
   padding: 1rem 1.6rem;
-  border: 1px solid var(--line-strong);
+  border: 1px solid var(--accent-strong);
   border-radius: 14px;
   background:
     linear-gradient(180deg, rgba(255, 205, 103, 0.16), rgba(255, 123, 14, 0.08)),
@@ -420,7 +421,7 @@ img {
 .showcase-button:hover,
 .showcase-button:focus-visible {
   transform: translateY(-2px);
-  border-color: rgba(255, 214, 110, 0.95);
+  border-color: var(--accent-strong);
   box-shadow:
     inset 0 0 0 1px rgba(255, 243, 200, 0.08),
     0 0 28px rgba(255, 173, 31, 0.3),
