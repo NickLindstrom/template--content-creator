@@ -232,6 +232,88 @@
     }
   }
 
+  function setupGalleryModal() {
+    var modal = null;
+    var modalImage = null;
+    var lastActiveElement = null;
+
+    function ensureModal() {
+      if (modal) {
+        return;
+      }
+
+      modal = document.createElement("div");
+      modal.className = "gallery-modal";
+      modal.hidden = true;
+      modal.setAttribute("role", "dialog");
+      modal.setAttribute("aria-modal", "true");
+      modal.setAttribute("aria-label", "Bildvisning");
+      modal.innerHTML = [
+        '<button class="gallery-modal__backdrop" type="button" aria-label="Stäng bild"></button>',
+        '<div class="gallery-modal__content">',
+        '  <button class="gallery-modal__close" type="button" aria-label="Stäng bild">×</button>',
+        '  <img class="gallery-modal__image" alt="">',
+        '</div>',
+      ].join("");
+      document.body.appendChild(modal);
+
+      modalImage = modal.querySelector(".gallery-modal__image");
+      modal.querySelectorAll("button").forEach(function (button) {
+        button.addEventListener("click", closeModal);
+      });
+    }
+
+    function openModal(src, alt) {
+      if (!hasText(src)) {
+        return;
+      }
+
+      ensureModal();
+      lastActiveElement = document.activeElement;
+      modalImage.src = src;
+      modalImage.alt = alt || "";
+      modal.hidden = false;
+      document.body.classList.add("gallery-modal-open");
+      modal.querySelector(".gallery-modal__close").focus();
+    }
+
+    function closeModal() {
+      if (!modal || modal.hidden) {
+        return;
+      }
+
+      modal.hidden = true;
+      modalImage.removeAttribute("src");
+      document.body.classList.remove("gallery-modal-open");
+
+      if (lastActiveElement && typeof lastActiveElement.focus === "function") {
+        lastActiveElement.focus();
+      }
+    }
+
+    document.addEventListener("click", function (event) {
+      var trigger = event.target.closest(".gallery-card__button, .gallery-card__image");
+      if (!trigger) {
+        return;
+      }
+
+      var image = trigger.matches(".gallery-card__image")
+        ? trigger
+        : trigger.querySelector(".gallery-card__image");
+      var src = trigger.getAttribute("data-gallery-full-src") || (image && (image.currentSrc || image.src)) || "";
+      var alt = trigger.getAttribute("data-gallery-alt") || (image && image.alt) || "";
+
+      event.preventDefault();
+      openModal(src, alt);
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") {
+        closeModal();
+      }
+    });
+  }
+
   /* ------------------------------------------------------------------------ */
   /* Init                                                                     */
   /* ------------------------------------------------------------------------ */
@@ -243,4 +325,5 @@
   }
 
   setupNavigation();
+  setupGalleryModal();
 })();

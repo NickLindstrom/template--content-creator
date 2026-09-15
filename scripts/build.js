@@ -662,13 +662,21 @@ function renderGallery(items = []) {
     .map(
       (item) => `
         <figure class="gallery-card">
-          <img
-            class="gallery-card__image"
-            src="${escapeHtml(item.url)}"
-            alt="${escapeHtml(item.alt || "")}"
-            loading="lazy"
-            decoding="async"
+          <button
+            class="gallery-card__button"
+            type="button"
+            data-gallery-full-src="${escapeHtml(item.url)}"
+            data-gallery-alt="${escapeHtml(item.alt || "")}"
+            aria-label="Visa bild i fullstorlek"
           >
+            <img
+              class="gallery-card__image"
+              src="${escapeHtml(item.url)}"
+              alt="${escapeHtml(item.alt || "")}"
+              loading="lazy"
+              decoding="async"
+            >
+          </button>
         </figure>
       `,
     )

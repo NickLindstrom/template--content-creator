@@ -649,11 +649,17 @@
       .map(function (item) {
         return [
           '<figure class="gallery-card">',
-          '  <img class="gallery-card__image" loading="lazy" src="' +
+          '  <button class="gallery-card__button" type="button" data-gallery-full-src="' +
+            escapeHtml(item.url) +
+            '" data-gallery-alt="' +
+            escapeHtml(item.alt || "") +
+            '" aria-label="Visa bild i fullstorlek">',
+          '    <img class="gallery-card__image" loading="lazy" decoding="async" src="' +
             escapeHtml(item.url) +
             '" alt="' +
             escapeHtml(item.alt || "") +
             '">',
+          "  </button>",
           "</figure>",
         ].join("");
       })
