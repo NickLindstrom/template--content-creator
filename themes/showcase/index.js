@@ -166,6 +166,156 @@
     }
   }
 
+  function absoluteUrl(value) {
+    if (!hasText(value)) return "";
+    try {
+      return new URL(value, window.location.href).href;
+    } catch (error) {
+      return "";
+    }
+  }
+
+  function cleanObject(value) {
+    if (Array.isArray(value)) {
+      return value.map(cleanObject).filter(function (item) {
+        return item !== undefined && item !== null && item !== "";
+      });
+    }
+
+    if (value && typeof value === "object") {
+      return Object.entries(value).reduce(function (acc, entry) {
+        var cleaned = cleanObject(entry[1]);
+        if (
+          cleaned !== undefined &&
+          cleaned !== null &&
+          cleaned !== "" &&
+          (!Array.isArray(cleaned) || cleaned.length)
+        ) {
+          acc[entry[0]] = cleaned;
+        }
+        return acc;
+      }, {});
+    }
+
+    return hasText(value) ? value : undefined;
+  }
+
+  function upsertJsonLd(content) {
+    var scriptId = "site-json-ld";
+    var script = document.getElementById(scriptId);
+    if (!script) {
+      script = document.createElement("script");
+      script.id = scriptId;
+      script.type = "application/ld+json";
+      document.head.appendChild(script);
+    }
+
+    var site = content.site || {};
+    var seo = content.seo || {};
+    var contact = content.contact || {};
+    var footer = content.footer || {};
+    var media = content.media || {};
+    var services = content.services || {};
+    var schemaDayNames = {
+      "Måndag": "Monday",
+      "Tisdag": "Tuesday",
+      "Onsdag": "Wednesday",
+      "Torsdag": "Thursday",
+      "Fredag": "Friday",
+      "Lördag": "Saturday",
+      "Söndag": "Sunday"
+    };
+    var pageUrl = window.location.href.split("#")[0];
+    var logoUrl = absoluteUrl(media.logoUrl);
+    var heroImageUrl = absoluteUrl(media.heroImage && media.heroImage.url);
+    var galleryImages = Array.isArray(media.gallery)
+      ? media.gallery.map(function (item) { return absoluteUrl(item.url); }).filter(Boolean)
+      : [];
+    var serviceOffers = Array.isArray(services.items)
+      ? services.items.filter(function (item) {
+          return item && (hasText(item.title) || hasText(item.description));
+        }).map(function (item) {
+          return {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: item.title,
+              description: item.description
+            }
+          };
+        })
+      : [];
+    var sameAs = Object.values(footer.socialLinks || {}).filter(function (value) {
+      return hasText(value);
+    });
+    var openingHoursSpecification = ((content.openingHours && content.openingHours.days) || [])
+      .filter(function (item) {
+        return item && item.closed !== true && hasText(item.opens) && hasText(item.closes);
+      })
+      .map(function (item) {
+        return {
+          "@type": "OpeningHoursSpecification",
+          dayOfWeek: schemaDayNames[item.day] || item.day,
+          opens: item.opens,
+          closes: item.closes
+        };
+      });
+
+    var graph = [
+      {
+        "@type": ["LocalBusiness", "ProfessionalService"],
+        "@id": pageUrl + "#business",
+        name: site.displayName || site.companyName || footer.companyName,
+        legalName: site.companyName || footer.companyName,
+        url: pageUrl,
+        description: seo.description || contact.body || footer.tagline,
+        telephone: contact.phone,
+        email: contact.email,
+        address: contact.address,
+        logo: logoUrl,
+        image: [heroImageUrl].concat(galleryImages).filter(Boolean),
+        sameAs: sameAs,
+        openingHoursSpecification: openingHoursSpecification,
+        makesOffer: serviceOffers
+      },
+      {
+        "@type": "WebSite",
+        "@id": pageUrl + "#website",
+        url: pageUrl,
+        name: site.displayName || site.companyName || footer.companyName,
+        publisher: {
+          "@id": pageUrl + "#business"
+        },
+        inLanguage: site.language || "sv"
+      },
+      {
+        "@type": "WebPage",
+        "@id": pageUrl + "#webpage",
+        url: pageUrl,
+        name: seo.title || site.displayName || site.companyName,
+        description: seo.description,
+        isPartOf: {
+          "@id": pageUrl + "#website"
+        },
+        about: {
+          "@id": pageUrl + "#business"
+        },
+        primaryImageOfPage: heroImageUrl
+          ? {
+              "@type": "ImageObject",
+              url: heroImageUrl
+            }
+          : undefined,
+        inLanguage: site.language || "sv"
+      }
+    ];
+
+    script.textContent = JSON.stringify(cleanObject({
+      "@context": "https://schema.org",
+      "@graph": graph
+    }));
+  }
+
   function setLink(id, href, label, visible) {
     var element = document.getElementById(id);
     if (!element) return;
@@ -431,6 +581,41 @@
       .join("");
   }
 
+  function renderOpeningHours(content) {
+    var section = document.getElementById("opening-hours");
+    var list = document.getElementById("opening-hours-list");
+    if (!list) return;
+
+    var openingHours = content.openingHours || {};
+    var days = Array.isArray(openingHours.days) ? openingHours.days : [];
+    var visibleDays = days.filter(function (item) {
+      return item && (item.closed === true || hasText(item.opens) || hasText(item.closes));
+    });
+    var visible = openingHours.enabled !== false && visibleDays.length > 0;
+
+    if (section) section.hidden = !visible;
+    list.innerHTML = "";
+    if (!visible) return;
+
+    setText("opening-hours-eyebrow", sectionEyebrow(content, "openingHours", "Öppettider"));
+    setText("opening-hours-heading", openingHours.heading || "Öppettider");
+    setText("opening-hours-body", openingHours.body || "");
+    list.innerHTML = visibleDays
+      .map(function (item) {
+        var timeLabel = item.closed === true
+          ? "Stängt"
+          : [item.opens, item.closes].filter(hasText).join(" - ");
+
+        return [
+          '<div class="opening-hours-row">',
+          '  <span class="opening-hours-row__day">' + escapeHtml(item.day || "") + "</span>",
+          '  <span class="opening-hours-row__time">' + escapeHtml(timeLabel) + "</span>",
+          "</div>",
+        ].join("");
+      })
+      .join("");
+  }
+
   function renderGallery(content) {
     var section = document.getElementById("gallery");
     var navLink = document.getElementById("gallery-nav-link");
@@ -573,6 +758,7 @@
         content.media.heroImage.url) ||
         "",
     );
+    upsertJsonLd(content);
   }
 
   function applyContent(content) {
@@ -601,6 +787,7 @@
     renderAbout(content);
     renderTestimonials(content);
     renderFaq(content);
+    renderOpeningHours(content);
     renderGallery(content);
     renderContact(content);
     renderSocialLinks(content);

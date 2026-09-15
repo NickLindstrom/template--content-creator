@@ -391,9 +391,50 @@ a {
 
 .editorial-footer__layout {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr auto auto;
   gap: 1.5rem;
   align-items: start;
+}
+
+.editorial-footer__opening-hours {
+  display: grid;
+  gap: 0.65rem;
+  min-width: min(100%, 260px);
+}
+
+.editorial-footer__label {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.editorial-footer__heading {
+  margin: 0;
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+}
+
+.opening-hours-list {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.opening-hours-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: rgba(255, 255, 255, 0.78);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+}
+
+.opening-hours-row__day {
+  font-weight: 700;
 }
 
 .editorial-footer__tagline,
