@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 
 const projectRoot = path.resolve(__dirname, "..");
 const contentPath = path.join(projectRoot, "content", "home.json");
@@ -9,6 +10,126 @@ const outputPath = path.join(projectRoot, "index.html");
 /* -------------------------------------------------------------------------- */
 /* Helpers                                                                    */
 /* -------------------------------------------------------------------------- */
+
+function upsertCspMeta(html, policy) {
+  if (!hasText(policy)) {
+    return html;
+  }
+
+  const metaTag =
+    `<meta http-equiv="Content-Security-Policy" ` +
+    `content="${escapeHtml(policy)}">`;
+
+  const existingRegex =
+    /<meta\b[^>]*http-equiv\s*=\s*(["'])Content-Security-Policy\1[^>]*>/i;
+
+  if (existingRegex.test(html)) {
+    return html.replace(existingRegex, metaTag);
+  }
+
+  /*
+   * CSP bör ligga så tidigt som möjligt.
+   * Vi placerar den direkt efter charset.
+   */
+
+  const charsetRegex =
+    /<meta\b[^>]*charset\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)[^>]*>/i;
+
+  if (charsetRegex.test(html)) {
+    return html.replace(
+      charsetRegex,
+      (charsetTag) => `${charsetTag}\n  ${metaTag}`,
+    );
+  }
+
+  return html.replace(
+    /<head\b[^>]*>/i,
+    (headTag) => `${headTag}\n  ${metaTag}`,
+  );
+}
+
+function createCspHash(value) {
+  const hash = crypto
+    .createHash("sha256")
+    .update(String(value), "utf8")
+    .digest("base64");
+
+  return `'sha256-${hash}'`;
+}
+
+function sanitizeCspSources(values) {
+  if (!Array.isArray(values)) {
+    return [];
+  }
+
+  return Array.from(
+    new Set(
+      values
+        .map((value) => String(value || "").trim())
+        .filter(Boolean)
+        .filter((value) => !/[\s;]/.test(value)),
+    ),
+  );
+}
+
+function buildCsp(content, inlineScriptBodies = []) {
+  const config = content.security?.csp || {};
+
+  if (config.enabled === false) {
+    return "";
+  }
+
+  /*
+   * Script
+   *
+   * 'self' tillåter index.js.
+   * Hasharna tillåter exakt de inline-block som build.js känner till.
+   * Ingen unsafe-inline och ingen unsafe-eval.
+   */
+
+  const scriptSources = [
+    "'self'",
+    ...inlineScriptBodies.filter((body) => hasText(body)).map(createCspHash),
+  ];
+
+  /*
+   * Bilder
+   */
+
+  const imageSources = ["'self'", "data:", "blob:"];
+
+  if (config.allowAnyHttpsImages !== false) {
+    imageSources.push("https:");
+  }
+
+  imageSources.push(...sanitizeCspSources(config.extraImageSources));
+
+  const directives = [
+    "default-src 'none'",
+
+    `script-src ${Array.from(new Set(scriptSources)).join(" ")}`,
+
+    "script-src-attr 'none'",
+
+    "style-src 'self'",
+    "style-src-attr 'unsafe-inline'",
+
+    `img-src ${Array.from(new Set(imageSources)).join(" ")}`,
+
+    "font-src 'self' data:",
+    "connect-src 'self'",
+    "media-src 'self'",
+    "object-src 'none'",
+    "frame-src 'none'",
+    "worker-src 'none'",
+    "manifest-src 'self'",
+    "base-uri 'none'",
+    "form-action 'none'",
+    "upgrade-insecure-requests",
+  ];
+
+  return directives.join("; ");
+}
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
@@ -821,10 +942,11 @@ function buildJsonLd(content, pageUrl) {
   });
 }
 
-function upsertJsonLd(html, content, pageUrl) {
-  const jsonLd = safeJsonForHtml(buildJsonLd(content, pageUrl));
-
-  const scriptTag = `<script id="site-json-ld" type="application/ld+json">\n${jsonLd}\n</script>`;
+function upsertJsonLd(html, jsonLdBody) {
+  const scriptTag =
+    `<script id="site-json-ld" type="application/ld+json">` +
+    `${jsonLdBody}` +
+    `</script>`;
 
   const existingRegex =
     /<script\b[^>]*\bid\s*=\s*(["'])site-json-ld\1[^>]*>[\s\S]*?<\/script>/i;
@@ -885,11 +1007,15 @@ function renderPage(content) {
 
   const pageUrl = resolvePageUrl(content);
 
+  const initialContentBody = `\n${safeJsonForHtml(content)}\n`;
+
+  const jsonLdBody = `\n${safeJsonForHtml(buildJsonLd(content, pageUrl))}\n`;
+
   /* SEO + structured data */
 
   html = applySeo(html, content, pageUrl);
 
-  html = upsertJsonLd(html, content, pageUrl);
+  html = upsertJsonLd(html, jsonLdBody);
 
   html = applyThemeStylesheet(html, content);
 
@@ -1170,12 +1296,10 @@ function renderPage(content) {
    * index.js no longer renders content.
    */
 
-  html = replaceInnerById(
-    html,
-    "initial-content",
-    `\n${safeJsonForHtml(content)}\n`,
-  );
+  html = replaceInnerById(html, "initial-content", initialContentBody);
+  const cspPolicy = buildCsp(content, [initialContentBody, jsonLdBody]);
 
+  html = upsertCspMeta(html, cspPolicy);
   return html;
 }
 

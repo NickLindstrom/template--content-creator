@@ -127,5 +127,12 @@
       "alt": ""
     },
     "gallery": []
+  },
+  "security": {
+    "csp": {
+      "enabled": true,
+      "allowAnyHttpsImages": true,
+      "extraImageSources": []
+    }
   }
 }
