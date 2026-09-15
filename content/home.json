@@ -2,6 +2,7 @@
   "site": {
     "siteId": "00000000-0000-0000-0000-000000000000",
     "companyName": "Exempel Elservice AB",
+    "organizationNumber": "556000-0000",
     "displayName": "Exempel Elservice",
     "language": "sv",
     "primaryColor": "#1254c5",

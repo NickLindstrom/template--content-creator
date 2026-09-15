@@ -917,6 +917,8 @@ function buildJsonLd(content, pageUrl) {
 
       legalName: site.companyName || footer.companyName,
 
+      taxID: hasText(site.organizationNumber) ? site.organizationNumber : undefined,
+
       url: /^https?:\/\//i.test(pageUrl) ? pageUrl : undefined,
 
       description: seo.description || contact.body || footer.tagline,
@@ -1354,6 +1356,20 @@ function renderPage(content) {
   /* Footer */
 
   html = setText(html, "footer-tagline", content.footer?.tagline || "");
+
+  const organizationNumber = content.site?.organizationNumber;
+
+  html = setText(
+    html,
+    "footer-organization-number",
+    hasText(organizationNumber) ? `Org.nr: ${organizationNumber}` : "",
+  );
+
+  html = setHiddenById(
+    html,
+    "footer-organization-number",
+    !hasText(organizationNumber),
+  );
 
   html = setText(html, "footer-copyright", content.footer?.copyright || "");
 

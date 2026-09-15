@@ -267,6 +267,7 @@
         "@id": pageUrl + "#business",
         name: site.displayName || site.companyName || footer.companyName,
         legalName: site.companyName || footer.companyName,
+        taxID: hasText(site.organizationNumber) ? site.organizationNumber : undefined,
         url: pageUrl,
         description: seo.description || contact.body || footer.tagline,
         telephone: contact.phone,
@@ -779,6 +780,11 @@
     setText("hero-headline", content.hero.headline);
     setText("hero-subheadline", content.hero.subheadline);
     setText("footer-tagline", content.footer.tagline);
+    setText(
+      "footer-organization-number",
+      hasText(content.site.organizationNumber) ? "Org.nr: " + content.site.organizationNumber : "",
+    );
+    setHidden("footer-organization-number", !hasText(content.site.organizationNumber));
     setText("footer-copyright", content.footer.copyright);
 
     renderHeroVisual(content);
