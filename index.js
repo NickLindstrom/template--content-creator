@@ -202,6 +202,7 @@
       logo.className = "brand-mark__logo";
       logo.src = logoUrl;
       logo.alt = companyName + " logotyp";
+      logo.loading = "lazy";
       if (hasText(settings.logoWidth)) {
         logo.style.width = settings.logoWidth;
         logo.style.height = "auto";
@@ -244,7 +245,7 @@
     items.forEach(function (item) {
       var image =
         item.image && item.image.url
-          ? '<img class="service-card__image" src="' +
+          ? '<img class="service-card__image" loading="lazy" src="' +
             escapeHtml(item.image.url) +
             '" alt="' +
             escapeHtml(item.image.alt || item.title || "") +
@@ -283,7 +284,7 @@
     container.innerHTML = [
       '<div class="hero-visual">',
       '  <div class="hero-visual__main-card">',
-      '    <img class="hero-visual__image" src="' +
+      '    <img class="hero-visual__image" fetchpriority="high" src="' +
         escapeHtml(content.media.heroImage.url) +
         '" alt="' +
         escapeHtml(content.media.heroImage.alt || "") +
@@ -328,7 +329,7 @@
     ) {
       imageBlock = [
         '<div class="about-media__image-frame">',
-        '  <img class="about-media__image" src="' +
+        '  <img class="about-media__image" loading="lazy" src="' +
           escapeHtml(content.media.aboutImage.url) +
           '" alt="' +
           escapeHtml(content.media.aboutImage.alt || "") +
@@ -512,7 +513,7 @@
       .map(function (item) {
         return [
           '<figure class="gallery-card">',
-          '  <img class="gallery-card__image" src="' +
+          '  <img class="gallery-card__image" loading="lazy" src="' +
             escapeHtml(item.url) +
             '" alt="' +
             escapeHtml(item.alt || "") +

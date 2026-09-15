@@ -135,7 +135,7 @@ function resolveMedia(content) {
 
 function renderBrand({ companyName, logoUrl, className }) {
   const logo = logoUrl
-    ? `<img class="brand-mark__logo" src="${escapeHtml(logoUrl)}" alt="${escapeHtml(companyName)} logotyp">`
+    ? `<img class="brand-mark__logo" loading="lazy" src="${escapeHtml(logoUrl)}" alt="${escapeHtml(companyName)} logotyp">`
     : "";
 
   return `<a class="${escapeHtml(className)}" href="#top" aria-label="Till startsidan">${logo}<span class="brand-mark__text">${escapeHtml(companyName)}</span></a>`;
@@ -239,7 +239,7 @@ function renderGallery(gallery) {
     .map(
       (item) => `
       <figure class="gallery-card">
-        <img class="gallery-card__image" src="${escapeHtml(item.url)}" alt="${escapeHtml(item.alt)}">
+        <img class="gallery-card__image" loading="lazy" src="${escapeHtml(item.url)}" alt="${escapeHtml(item.alt)}">
       </figure>
     `,
     )
@@ -264,7 +264,7 @@ function renderHeroVisual(media, site, contact) {
   return `
     <div class="hero-visual">
       <div class="hero-visual__main-card">
-        <img class="hero-visual__image" src="${escapeHtml(media.heroImage.url)}" alt="${escapeHtml(media.heroImage.alt)}">
+        <img class="hero-visual__image" fetchpriority="high" src="${escapeHtml(media.heroImage.url)}" alt="${escapeHtml(media.heroImage.alt)}">
       </div>
       <div class="hero-visual__floating-card">
         <p class="hero-visual__label">Lokalt fokus</p>
@@ -279,7 +279,7 @@ function renderAboutVisual(media, usp) {
   const imageBlock = media.aboutImage
     ? `
       <div class="about-media__image-frame">
-        <img class="about-media__image" src="${escapeHtml(media.aboutImage.url)}" alt="${escapeHtml(media.aboutImage.alt)}">
+        <img class="about-media__image" loading="lazy" src="${escapeHtml(media.aboutImage.url)}" alt="${escapeHtml(media.aboutImage.alt)}">
       </div>
     `
     : "";
