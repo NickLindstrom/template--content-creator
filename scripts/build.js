@@ -46,6 +46,92 @@ function localeFromLanguage(language) {
   return language === "sv" ? "sv_SE" : "en_US";
 }
 
+function cleanObject(value) {
+  if (Array.isArray(value)) {
+    return value
+      .map(cleanObject)
+      .filter((item) => item !== undefined && item !== null && item !== "");
+  }
+
+  if (value && typeof value === "object") {
+    return Object.entries(value).reduce((acc, [key, item]) => {
+      const cleaned = cleanObject(item);
+
+      if (
+        cleaned !== undefined &&
+        cleaned !== null &&
+        cleaned !== "" &&
+        (!Array.isArray(cleaned) || cleaned.length)
+      ) {
+        acc[key] = cleaned;
+      }
+
+      return acc;
+    }, {});
+  }
+
+  return hasText(value) ? value : undefined;
+}
+
+/* -------------------------------------------------------------------------- */
+/* URL helpers                                                                */
+/* -------------------------------------------------------------------------- */
+
+function resolvePageUrl(content) {
+  const configuredUrl =
+    content.site?.url || content.seo?.canonical || process.env.SITE_URL || "";
+
+  if (hasText(configuredUrl)) {
+    return configuredUrl.endsWith("/") ? configuredUrl : `${configuredUrl}/`;
+  }
+
+  /*
+   * GitHub Actions exposes GITHUB_REPOSITORY as:
+   *
+   * owner/repository
+   *
+   * That lets us derive a GitHub Pages project URL:
+   *
+   * https://owner.github.io/repository/
+   */
+
+  if (hasText(process.env.GITHUB_REPOSITORY)) {
+    const [owner, repository] = process.env.GITHUB_REPOSITORY.split("/");
+
+    if (owner && repository) {
+      return `https://${owner}.github.io/${repository}/`;
+    }
+  }
+
+  /*
+   * Local fallback.
+   *
+   * For production, site.url in home.json is recommended.
+   */
+
+  return "/";
+}
+
+function absoluteUrl(value, pageUrl) {
+  if (!hasText(value)) {
+    return "";
+  }
+
+  try {
+    if (/^https?:\/\//i.test(value)) {
+      return new URL(value).href;
+    }
+
+    if (!/^https?:\/\//i.test(pageUrl)) {
+      return value;
+    }
+
+    return new URL(value, pageUrl).href;
+  } catch (error) {
+    return "";
+  }
+}
+
 /* -------------------------------------------------------------------------- */
 /* HTML manipulation                                                          */
 /* -------------------------------------------------------------------------- */
@@ -70,6 +156,7 @@ function findElementById(html, id) {
   const openEnd = openStart + openTag.length;
 
   const tagRegex = new RegExp(`<\\/?${escapeRegExp(tagName)}\\b[^>]*>`, "gi");
+
   tagRegex.lastIndex = openEnd;
 
   let depth = 1;
@@ -104,7 +191,6 @@ function replaceInnerById(html, id, innerHtml) {
   const element = findElementById(html, id);
 
   if (!element) {
-    console.warn(`Element #${id} hittades inte i template.`);
     return html;
   }
 
@@ -177,6 +263,7 @@ function setText(html, id, value) {
 
 function setLink(html, id, href, label) {
   html = setAttributeById(html, id, "href", href || "#");
+
   html = setText(html, id, label || "");
 
   return html;
@@ -199,6 +286,26 @@ function setTitle(html, title) {
   return html.replace(
     /<title\b[^>]*>[\s\S]*?<\/title>/i,
     `<title>${escapeHtml(title)}</title>`,
+  );
+}
+
+function upsertHeadLink(html, rel, href) {
+  if (!hasText(href)) {
+    return html;
+  }
+
+  const regex = new RegExp(
+    `<link\\b(?=[^>]*\\brel\\s*=\\s*(["'])${escapeRegExp(rel)}\\1)[^>]*>`,
+    "i",
+  );
+
+  if (regex.test(html)) {
+    return html.replace(regex, (tag) => setTagAttribute(tag, "href", href));
+  }
+
+  return html.replace(
+    /<\/head>/i,
+    `  <link rel="${escapeHtml(rel)}" href="${escapeHtml(href)}">\n</head>`,
   );
 }
 
@@ -265,7 +372,9 @@ function renderHeroVisual(content) {
       </div>
 
       <div class="hero-visual__floating-card">
-        <p class="hero-visual__label">Lokalt fokus</p>
+        <p class="hero-visual__label">
+          Lokalt fokus
+        </p>
 
         <p class="hero-visual__value">
           ${escapeHtml(content.site?.displayName || "")}
@@ -290,16 +399,16 @@ function renderAboutVisual(content) {
 
   const imageHtml = image?.url
     ? `
-      <div class="about-media__image-frame">
-        <img
-          class="about-media__image"
-          src="${escapeHtml(image.url)}"
-          alt="${escapeHtml(image.alt || "")}"
-          loading="lazy"
-          decoding="async"
-        >
-      </div>
-    `
+        <div class="about-media__image-frame">
+          <img
+            class="about-media__image"
+            src="${escapeHtml(image.url)}"
+            alt="${escapeHtml(image.alt || "")}"
+            loading="lazy"
+            decoding="async"
+          >
+        </div>
+      `
     : "";
 
   const uspItems = Array.isArray(content.usp?.items)
@@ -307,7 +416,8 @@ function renderAboutVisual(content) {
     : [];
 
   const uspHtml =
-    uspItems.length || hasText(content.usp?.heading)
+    content.usp?.enabled !== false &&
+    (uspItems.length || hasText(content.usp?.heading))
       ? `
         <div class="highlight-panel">
           <p class="highlight-panel__label">
@@ -395,8 +505,20 @@ function renderGallery(items = []) {
 }
 
 function renderSocialLinks(links = {}) {
-  return Object.entries(links)
-    .filter(([, url]) => hasText(url))
+  const uniqueEntries = [];
+  const seenUrls = new Set();
+
+  Object.entries(links).forEach(([name, url]) => {
+    if (!hasText(url) || seenUrls.has(url)) {
+      return;
+    }
+
+    seenUrls.add(url);
+
+    uniqueEntries.push([name, url]);
+  });
+
+  return uniqueEntries
     .map(
       ([name, url]) => `
         <a
@@ -414,7 +536,9 @@ function renderSocialLinks(links = {}) {
 
 function renderBrand(content, footer = false) {
   const logoUrl = content.media?.logoUrl;
+
   const logoOnly = !footer && Boolean(content.media?.headerLogoOnly);
+
   const companyName = footer
     ? content.footer?.companyName || content.site?.displayName
     : content.site?.displayName;
@@ -425,13 +549,13 @@ function renderBrand(content, footer = false) {
 
   const logo = logoUrl
     ? `
-      <img
-        class="brand-mark__logo"
-        src="${escapeHtml(logoUrl)}"
-        alt="${escapeHtml(companyName)} logotyp"
-        ${width}
-      >
-    `
+        <img
+          class="brand-mark__logo"
+          src="${escapeHtml(logoUrl)}"
+          alt="${escapeHtml(companyName)} logotyp"
+          ${width}
+        >
+      `
     : "";
 
   const text =
@@ -442,13 +566,44 @@ function renderBrand(content, footer = false) {
   return `${logo}${text}`;
 }
 
+function renderOpeningHoursDays(days = []) {
+  return days
+    .filter(
+      (item) =>
+        item &&
+        (item.closed === true || hasText(item.opens) || hasText(item.closes)),
+    )
+    .map((item) => {
+      const timeLabel =
+        item.closed === true
+          ? "Stängt"
+          : [item.opens, item.closes].filter(hasText).join(" – ");
+
+      return `
+        <div class="opening-hours-row">
+          <span class="opening-hours-row__day">
+            ${escapeHtml(item.day || "")}
+          </span>
+
+          <span class="opening-hours-row__time">
+            ${escapeHtml(timeLabel)}
+          </span>
+        </div>
+      `;
+    })
+    .join("");
+}
+
 /* -------------------------------------------------------------------------- */
 /* SEO                                                                        */
 /* -------------------------------------------------------------------------- */
 
-function applySeo(html, content) {
+function applySeo(html, content, pageUrl) {
   const title = content.seo?.title || content.site?.displayName || "";
+
   const description = content.seo?.description || "";
+
+  const heroImage = absoluteUrl(content.media?.heroImage?.url || "", pageUrl);
 
   html = setTitle(html, title);
 
@@ -462,30 +617,223 @@ function applySeo(html, content) {
   );
 
   html = setMeta(html, "property", "og:title", title);
+
   html = setMeta(html, "property", "og:description", description);
 
-  html = setMeta(
-    html,
-    "property",
-    "og:image",
-    content.media?.heroImage?.url || "",
-  );
+  html = setMeta(html, "property", "og:image", heroImage);
 
   html = setMeta(html, "name", "twitter:title", title);
+
   html = setMeta(html, "name", "twitter:description", description);
 
-  html = setMeta(
-    html,
-    "name",
-    "twitter:image",
-    content.media?.heroImage?.url || "",
-  );
+  html = setMeta(html, "name", "twitter:image", heroImage);
 
   html = html.replace(/<html\b[^>]*>/i, (tag) =>
     setTagAttribute(tag, "lang", content.site?.language || "sv"),
   );
 
+  if (/^https?:\/\//i.test(pageUrl)) {
+    html = upsertHeadLink(html, "canonical", pageUrl);
+  }
+
   return html;
+}
+
+/* -------------------------------------------------------------------------- */
+/* JSON-LD                                                                    */
+/* -------------------------------------------------------------------------- */
+
+function buildJsonLd(content, pageUrl) {
+  const site = content.site || {};
+
+  const seo = content.seo || {};
+
+  const contact = content.contact || {};
+
+  const footer = content.footer || {};
+
+  const media = content.media || {};
+
+  const services = content.services || {};
+
+  const openingHours = content.openingHours || {};
+
+  const schemaDayNames = {
+    Måndag: "Monday",
+    Tisdag: "Tuesday",
+    Onsdag: "Wednesday",
+    Torsdag: "Thursday",
+    Fredag: "Friday",
+    Lördag: "Saturday",
+    Söndag: "Sunday",
+  };
+
+  const logoUrl = absoluteUrl(media.logoUrl, pageUrl);
+
+  const heroImageUrl = absoluteUrl(media.heroImage?.url, pageUrl);
+
+  const galleryImages = Array.isArray(media.gallery)
+    ? media.gallery
+        .map((item) => absoluteUrl(item?.url, pageUrl))
+        .filter(Boolean)
+    : [];
+
+  const serviceOffers = Array.isArray(services.items)
+    ? services.items
+        .filter(
+          (item) => item && (hasText(item.title) || hasText(item.description)),
+        )
+        .map((item) => ({
+          "@type": "Offer",
+
+          itemOffered: {
+            "@type": "Service",
+            name: item.title,
+            description: item.description,
+          },
+        }))
+    : [];
+
+  const sameAs = Array.from(
+    new Set(
+      Object.values(footer.socialLinks || {}).filter((value) => hasText(value)),
+    ),
+  );
+
+  const openingHoursSpecification = Array.isArray(openingHours.days)
+    ? openingHours.days
+        .filter(
+          (item) =>
+            item &&
+            item.closed !== true &&
+            hasText(item.opens) &&
+            hasText(item.closes),
+        )
+        .map((item) => ({
+          "@type": "OpeningHoursSpecification",
+
+          dayOfWeek: schemaDayNames[item.day] || item.day,
+
+          opens: item.opens,
+
+          closes: item.closes,
+        }))
+    : [];
+
+  const businessType = hasText(site.schemaType)
+    ? site.schemaType
+    : "LocalBusiness";
+
+  const businessId = /^https?:\/\//i.test(pageUrl)
+    ? `${pageUrl}#business`
+    : "#business";
+
+  const websiteId = /^https?:\/\//i.test(pageUrl)
+    ? `${pageUrl}#website`
+    : "#website";
+
+  const webpageId = /^https?:\/\//i.test(pageUrl)
+    ? `${pageUrl}#webpage`
+    : "#webpage";
+
+  const graph = [
+    {
+      "@type": [businessType, "ProfessionalService"],
+
+      "@id": businessId,
+
+      name: site.displayName || site.companyName || footer.companyName,
+
+      legalName: site.companyName || footer.companyName,
+
+      url: /^https?:\/\//i.test(pageUrl) ? pageUrl : undefined,
+
+      description: seo.description || contact.body || footer.tagline,
+
+      telephone: contact.phone,
+
+      email: contact.email,
+
+      address: contact.address,
+
+      logo: logoUrl,
+
+      image: [heroImageUrl].concat(galleryImages).filter(Boolean),
+
+      sameAs,
+
+      openingHoursSpecification,
+
+      makesOffer: serviceOffers,
+    },
+
+    {
+      "@type": "WebSite",
+
+      "@id": websiteId,
+
+      url: /^https?:\/\//i.test(pageUrl) ? pageUrl : undefined,
+
+      name: site.displayName || site.companyName || footer.companyName,
+
+      publisher: {
+        "@id": businessId,
+      },
+
+      inLanguage: site.language || "sv",
+    },
+
+    {
+      "@type": "WebPage",
+
+      "@id": webpageId,
+
+      url: /^https?:\/\//i.test(pageUrl) ? pageUrl : undefined,
+
+      name: seo.title || site.displayName || site.companyName,
+
+      description: seo.description,
+
+      isPartOf: {
+        "@id": websiteId,
+      },
+
+      about: {
+        "@id": businessId,
+      },
+
+      primaryImageOfPage: heroImageUrl
+        ? {
+            "@type": "ImageObject",
+
+            url: heroImageUrl,
+          }
+        : undefined,
+
+      inLanguage: site.language || "sv",
+    },
+  ];
+
+  return cleanObject({
+    "@context": "https://schema.org",
+
+    "@graph": graph,
+  });
+}
+
+function upsertJsonLd(html, content, pageUrl) {
+  const jsonLd = safeJsonForHtml(buildJsonLd(content, pageUrl));
+
+  const scriptTag = `<script id="site-json-ld" type="application/ld+json">\n${jsonLd}\n</script>`;
+
+  const existingRegex =
+    /<script\b[^>]*\bid\s*=\s*(["'])site-json-ld\1[^>]*>[\s\S]*?<\/script>/i;
+
+  if (existingRegex.test(html)) {
+    return html.replace(existingRegex, scriptTag);
+  }
+
+  return html.replace(/<\/head>/i, `  ${scriptTag}\n</head>`);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -518,15 +866,6 @@ function applyThemeStylesheet(html, content) {
 /* -------------------------------------------------------------------------- */
 
 function renderPage(content) {
-  /*
-   * Om du senare skapar exempelvis:
-   *
-   * themes/editorial/template.html
-   * themes/classic/template.html
-   *
-   * används rätt template automatiskt.
-   */
-
   const theme = String(content.site?.theme || "").trim();
 
   const themeTemplate = theme
@@ -544,9 +883,14 @@ function renderPage(content) {
 
   let html = fs.readFileSync(templatePath, "utf8");
 
-  /* SEO */
+  const pageUrl = resolvePageUrl(content);
 
-  html = applySeo(html, content);
+  /* SEO + structured data */
+
+  html = applySeo(html, content, pageUrl);
+
+  html = upsertJsonLd(html, content, pageUrl);
+
   html = applyThemeStylesheet(html, content);
 
   /* Branding */
@@ -558,7 +902,9 @@ function renderPage(content) {
   /* Hero */
 
   html = setText(html, "hero-eyebrow", content.hero?.eyebrow);
+
   html = setText(html, "hero-headline", content.hero?.headline);
+
   html = setText(html, "hero-subheadline", content.hero?.subheadline);
 
   html = setLink(
@@ -575,12 +921,27 @@ function renderPage(content) {
     content.hero?.primaryCtaLabel || "Kontakt",
   );
 
+  html = setHiddenById(html, "top", content.hero?.enabled === false);
+
   html = replaceInnerById(html, "hero-visual-slot", renderHeroVisual(content));
 
   /* Intro */
 
+  const introVisible =
+    content.intro?.enabled !== false &&
+    (hasText(content.intro?.heading) || hasText(content.intro?.body));
+
+  html = setText(
+    html,
+    "intro-eyebrow",
+    content.intro?.eyebrow || "Introduktion",
+  );
+
   html = setText(html, "intro-heading", content.intro?.heading);
+
   html = setText(html, "intro-body", content.intro?.body);
+
+  html = setHiddenById(html, "intro-section", !introVisible);
 
   /* Services */
 
@@ -591,15 +952,40 @@ function renderPage(content) {
   const servicesVisible =
     content.services?.enabled !== false && serviceItems.length > 0;
 
+  html = setText(
+    html,
+    "services-eyebrow",
+    content.services?.eyebrow || "Tjänster",
+  );
+
   html = setText(html, "services-heading", content.services?.heading);
 
   html = replaceInnerById(html, "services-list", renderServices(serviceItems));
 
   html = setHiddenById(html, "services", !servicesVisible);
 
+  html = setHiddenById(html, "services-nav-link", !servicesVisible);
+
   /* About */
 
+  const hasAboutText =
+    hasText(content.about?.heading) || hasText(content.about?.body);
+
+  const hasAboutMedia = Boolean(content.media?.aboutImage?.url);
+
+  const hasUspContent =
+    content.usp?.enabled !== false &&
+    (hasText(content.usp?.heading) ||
+      (Array.isArray(content.usp?.items) && content.usp.items.some(hasText)));
+
+  const aboutVisible =
+    content.about?.enabled !== false &&
+    (hasAboutText || hasAboutMedia || hasUspContent);
+
+  html = setText(html, "about-eyebrow", content.about?.eyebrow || "Om oss");
+
   html = setText(html, "about-heading", content.about?.heading);
+
   html = setText(html, "about-body", content.about?.body);
 
   html = replaceInnerById(
@@ -607,6 +993,10 @@ function renderPage(content) {
     "about-visual-slot",
     renderAboutVisual(content),
   );
+
+  html = setHiddenById(html, "about", !aboutVisible);
+
+  html = setHiddenById(html, "about-nav-link", !aboutVisible);
 
   /* Gallery */
 
@@ -619,6 +1009,12 @@ function renderPage(content) {
 
   html = setText(
     html,
+    "gallery-eyebrow",
+    content.media?.galleryEyebrow || "Bilder",
+  );
+
+  html = setText(
+    html,
     "gallery-heading",
     content.media?.galleryHeading || "Inblick i verksamheten",
   );
@@ -626,6 +1022,7 @@ function renderPage(content) {
   html = replaceInnerById(html, "gallery-grid", renderGallery(galleryItems));
 
   html = setHiddenById(html, "gallery", !galleryVisible);
+
   html = setHiddenById(html, "gallery-nav-link", !galleryVisible);
 
   /* Testimonials */
@@ -635,7 +1032,13 @@ function renderPage(content) {
     : [];
 
   const testimonialsVisible =
-    Boolean(content.testimonials?.enabled) && testimonialItems.length > 0;
+    content.testimonials?.enabled !== false && testimonialItems.length > 0;
+
+  html = setText(
+    html,
+    "testimonials-eyebrow",
+    content.testimonials?.eyebrow || "Omdömen",
+  );
 
   html = setText(html, "testimonials-heading", content.testimonials?.heading);
 
@@ -651,7 +1054,9 @@ function renderPage(content) {
 
   const faqItems = Array.isArray(content.faq?.items) ? content.faq.items : [];
 
-  const faqVisible = Boolean(content.faq?.enabled) && faqItems.length > 0;
+  const faqVisible = content.faq?.enabled !== false && faqItems.length > 0;
+
+  html = setText(html, "faq-eyebrow", content.faq?.eyebrow || "FAQ");
 
   html = setText(html, "faq-heading", content.faq?.heading);
 
@@ -661,7 +1066,22 @@ function renderPage(content) {
 
   /* Contact */
 
+  const contactVisible =
+    content.contact?.enabled !== false &&
+    (hasText(content.contact?.heading) ||
+      hasText(content.contact?.body) ||
+      hasText(content.contact?.phone) ||
+      hasText(content.contact?.email) ||
+      hasText(content.contact?.address));
+
+  html = setText(
+    html,
+    "contact-eyebrow",
+    content.contact?.eyebrow || "Kontakt",
+  );
+
   html = setText(html, "contact-heading", content.contact?.heading);
+
   html = setText(html, "contact-body", content.contact?.body);
 
   html = setLink(
@@ -680,6 +1100,51 @@ function renderPage(content) {
 
   html = setText(html, "contact-address", content.contact?.address || "");
 
+  html = setHiddenById(html, "contact", !contactVisible);
+
+  html = setHiddenById(
+    html,
+    "nav-cta-link",
+    !contactVisible || !hasText(content.hero?.primaryCtaLabel),
+  );
+
+  html = setHiddenById(
+    html,
+    "hero-primary-cta",
+    !contactVisible || !hasText(content.hero?.primaryCtaLabel),
+  );
+
+  /* Opening hours */
+
+  const openingHours = content.openingHours || {};
+
+  const openingHourDays = Array.isArray(openingHours.days)
+    ? openingHours.days
+    : [];
+
+  const openingHoursHtml = renderOpeningHoursDays(openingHourDays);
+
+  const openingHoursVisible =
+    openingHours.enabled !== false && hasText(openingHoursHtml);
+
+  html = setText(
+    html,
+    "opening-hours-eyebrow",
+    openingHours.eyebrow || "Öppettider",
+  );
+
+  html = setText(
+    html,
+    "opening-hours-heading",
+    openingHours.heading || "Öppettider",
+  );
+
+  html = setText(html, "opening-hours-body", openingHours.body || "");
+
+  html = replaceInnerById(html, "opening-hours-list", openingHoursHtml);
+
+  html = setHiddenById(html, "opening-hours", !openingHoursVisible);
+
   /* Footer */
 
   html = setText(html, "footer-tagline", content.footer?.tagline || "");
@@ -692,11 +1157,17 @@ function renderPage(content) {
     renderSocialLinks(content.footer?.socialLinks),
   );
 
+  html = setHiddenById(html, "site-footer", content.footer?.enabled === false);
+
   /*
-   * Behåll JSON i sidan.
+   * Embedded JSON is kept only for lightweight frontend configuration:
    *
-   * Ditt nuvarande index.js kan därför fortsätta läsa:
-   * document.getElementById("initial-content")
+   * - theme mode
+   * - colours
+   * - fonts
+   * - image ratio
+   *
+   * index.js no longer renders content.
    */
 
   html = replaceInnerById(
@@ -721,7 +1192,14 @@ function renderPage(content) {
 
   console.log("");
   console.log("Static build klar.");
+
   console.log(`Source: ${contentPath}`);
+
   console.log(`Output: ${outputPath}`);
+
+  console.log("JSON-LD: genererad statiskt");
+
+  console.log("Öppettider: genererade statiskt");
+
   console.log("");
 })();

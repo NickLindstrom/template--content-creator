@@ -1,718 +1,246 @@
 (function () {
+  "use strict";
+
+  var root = document.documentElement;
+
+  var body = document.body;
+
   var navToggle = document.querySelector(".nav-toggle");
+
   var siteNavigation = document.querySelector(
     "#site-navigation, .site-navigation, .editorial-nav, .showcase-nav",
   );
 
-  function escapeHtml(value) {
-    return String(value ?? "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#39;");
-  }
-
-  function localeFromLanguage(language) {
-    return language === "sv" ? "sv_SE" : "en_US";
-  }
+  /* ------------------------------------------------------------------------ */
+  /* Helpers                                                                  */
+  /* ------------------------------------------------------------------------ */
 
   function hasText(value) {
     return Boolean(String(value || "").trim());
   }
 
-  function hasVisibleItems(items) {
-    return (
-      Array.isArray(items) &&
-      items.some(function (item) {
-        if (typeof item === "string") {
-          return hasText(item);
-        }
-
-        if (!item || typeof item !== "object") {
-          return false;
-        }
-
-        return Object.values(item).some(function (value) {
-          return hasText(value);
-        });
-      })
-    );
-  }
-
-  function isSectionEnabled(content, key) {
-    var section = content && content[key];
-    return !section || section.enabled !== false;
-  }
-
-  function sectionEyebrow(content, key, fallback) {
-    var section = content && content[key];
-    return section && hasText(section.eyebrow) ? section.eyebrow : fallback;
-  }
-
-  function setThemeMode(mode) {
-    var resolvedMode = mode === "dark" ? "dark" : "light";
-    document.documentElement.setAttribute("data-theme-mode", resolvedMode);
-    if (document.body) {
-      document.body.setAttribute("data-theme-mode", resolvedMode);
-    }
-  }
-
-  function setDesignSettings(content) {
-    var site = content.site || {};
-    var media = content.media || {};
-    var imageRatio = hasText(media.imageRatio) ? media.imageRatio : "4 / 3";
-    var headingFont = hasText(site.headingFont) ? site.headingFont : 'Georgia, "Times New Roman", serif';
-    var bodyFont = hasText(site.bodyFont) ? site.bodyFont : 'Arial, sans-serif';
-    document.documentElement.style.setProperty(
-      "--content-image-ratio",
-      imageRatio,
-    );
-    document.documentElement.style.setProperty("--font-heading", headingFont);
-    document.documentElement.style.setProperty("--font-body", bodyFont);
-    document.documentElement.style.setProperty("--serif", headingFont);
-    document.documentElement.style.setProperty("--sans", bodyFont);
-    if (document.body) {
-      document.body.style.fontFamily = bodyFont;
-    }
-
-    if (hasText(site.headerBackgroundColor)) {
-      document.documentElement.style.setProperty(
-        "--site-header-bg",
-        site.headerBackgroundColor,
-      );
-    } else {
-      document.documentElement.style.removeProperty("--site-header-bg");
-    }
-
-    if (hasText(site.mainBackgroundColor)) {
-      document.documentElement.style.setProperty(
-        "--site-main-bg",
-        site.mainBackgroundColor,
-      );
-    } else {
-      document.documentElement.style.removeProperty("--site-main-bg");
-    }
-
-    if (hasText(site.footerBackgroundColor)) {
-      document.documentElement.style.setProperty(
-        "--site-footer-bg",
-        site.footerBackgroundColor,
-      );
-    } else {
-      document.documentElement.style.removeProperty("--site-footer-bg");
-    }
-
-    if (hasText(site.primaryColor)) {
-      document.documentElement.style.setProperty(
-        "--color-primary",
-        site.primaryColor,
-      );
-      document.documentElement.style.setProperty(
-        "--color-primary-dark",
-        site.primaryColor,
-      );
-      document.documentElement.style.setProperty(
-        "--editorial-accent",
-        site.primaryColor,
-      );
-      document.documentElement.style.setProperty("--accent", site.primaryColor);
-      document.documentElement.style.setProperty(
-        "--accent-deep",
-        site.primaryColor,
-      );
-    }
-
-    if (hasText(site.secondaryColor)) {
-      document.documentElement.style.setProperty(
-        "--color-secondary",
-        site.secondaryColor,
-      );
-      document.documentElement.style.setProperty(
-        "--color-accent",
-        site.secondaryColor,
-      );
-      document.documentElement.style.setProperty(
-        "--editorial-accent-soft",
-        site.secondaryColor,
-      );
-      document.documentElement.style.setProperty(
-        "--accent-strong",
-        site.secondaryColor,
-      );
-    }
-  }
-
-  function setHidden(id, hidden) {
-    var element = document.getElementById(id);
-    if (element) {
-      element.hidden = hidden;
-    }
-  }
-
   function readEmbeddedContent() {
     var element = document.getElementById("initial-content");
-    if (!element) return null;
+
+    if (!element) {
+      return null;
+    }
 
     try {
-      return JSON.parse(element.textContent || "null");
+      return JSON.parse(element.textContent || "{}");
     } catch (error) {
-      console.error("Could not parse embedded content", error);
+      console.warn("Kunde inte läsa embedded site configuration.", error);
+
       return null;
     }
   }
 
-  function setText(id, value) {
-    var element = document.getElementById(id);
-    if (element) {
-      element.textContent = value || "";
+  function setCssVariable(name, value) {
+    if (hasText(value)) {
+      root.style.setProperty(name, value);
+    } else {
+      root.style.removeProperty(name);
     }
   }
 
-  function setMeta(selector, value) {
-    var element = document.querySelector(selector);
-    if (element) {
-      element.setAttribute("content", value || "");
+  /* ------------------------------------------------------------------------ */
+  /* Design settings                                                          */
+  /*
+   * Allt synligt innehåll, SEO, JSON-LD och öppettider genereras av build.js.
+   *
+   * Här läses endast visuella inställningar från den JSON-konfiguration som
+   * redan finns inbäddad i index.html.
+   */
+  /* ------------------------------------------------------------------------ */
+
+  function applyDesignSettings(content) {
+    if (!content) {
+      return;
     }
-  }
 
-  function setLink(id, href, label, visible) {
-    var element = document.getElementById(id);
-    if (!element) return;
-    element.setAttribute("href", href || "#");
-    element.textContent = label || "";
-    if (typeof visible === "boolean") {
-      element.hidden = !visible;
+    var site = content.site || {};
+
+    var media = content.media || {};
+
+    /* Theme mode */
+
+    var themeMode = site.themeMode === "dark" ? "dark" : "light";
+
+    root.setAttribute("data-theme-mode", themeMode);
+
+    if (body) {
+      body.setAttribute("data-theme-mode", themeMode);
     }
-  }
 
-  function createBrand(elementId, companyName, logoUrl, options) {
-    var element = document.getElementById(elementId);
-    if (!element) return;
+    /* Image ratio */
 
-    var settings = options || {};
-    element.innerHTML = "";
-    element.classList.toggle(
-      "brand-mark--logo-only",
-      Boolean(settings.logoOnly && logoUrl),
+    setCssVariable(
+      "--content-image-ratio",
+      hasText(media.imageRatio) ? media.imageRatio : "4 / 3",
     );
 
-    if (logoUrl) {
-      var logo = document.createElement("img");
-      logo.className = "brand-mark__logo";
-      logo.src = logoUrl;
-      logo.alt = companyName + " logotyp";
-      logo.loading = "lazy";
-      if (hasText(settings.logoWidth)) {
-        logo.style.width = settings.logoWidth;
-        logo.style.height = "auto";
+    /* Fonts */
+
+    if (hasText(site.headingFont)) {
+      setCssVariable("--font-heading", site.headingFont);
+
+      setCssVariable("--serif", site.headingFont);
+    }
+
+    if (hasText(site.bodyFont)) {
+      setCssVariable("--font-body", site.bodyFont);
+
+      setCssVariable("--sans", site.bodyFont);
+
+      if (body) {
+        body.style.fontFamily = site.bodyFont;
       }
-      element.appendChild(logo);
     }
 
-    if (!settings.logoOnly || !logoUrl) {
-      var text = document.createElement("span");
-      text.className = "brand-mark__text";
-      text.textContent = companyName || "";
-      element.appendChild(text);
+    /* Optional background colours */
+
+    setCssVariable("--site-header-bg", site.headerBackgroundColor);
+
+    setCssVariable("--site-main-bg", site.mainBackgroundColor);
+
+    setCssVariable("--site-footer-bg", site.footerBackgroundColor);
+
+    /* Primary colour */
+
+    if (hasText(site.primaryColor)) {
+      setCssVariable("--color-primary", site.primaryColor);
+
+      setCssVariable("--color-primary-dark", site.primaryColor);
+
+      setCssVariable("--editorial-accent", site.primaryColor);
+
+      setCssVariable("--accent", site.primaryColor);
+
+      setCssVariable("--accent-deep", site.primaryColor);
+    }
+
+    /* Secondary colour */
+
+    if (hasText(site.secondaryColor)) {
+      setCssVariable("--color-secondary", site.secondaryColor);
+
+      setCssVariable("--color-accent", site.secondaryColor);
+
+      setCssVariable("--editorial-accent-soft", site.secondaryColor);
+
+      setCssVariable("--accent-strong", site.secondaryColor);
     }
   }
 
-  function renderServices(content) {
-    var section = document.getElementById("services");
-    var navLink = document.getElementById("services-nav-link");
-    var container = document.getElementById("services-list");
-    if (!container) return;
-    container.innerHTML = "";
-
-    var items = (
-      content.services && Array.isArray(content.services.items)
-        ? content.services.items
-        : []
-    ).filter(function (item) {
-      return item && (hasText(item.title) || hasText(item.description));
-    });
-    var visible = isSectionEnabled(content, "services") && items.length > 0;
-    if (section) section.hidden = !visible;
-    if (navLink) navLink.hidden = !visible;
-    if (!visible) return;
-
-    setText(
-      "services-eyebrow",
-      sectionEyebrow(content, "services", "Tjänster"),
-    );
-    setText("services-heading", content.services.heading);
-    items.forEach(function (item) {
-      var image =
-        item.image && item.image.url
-          ? '<img class="service-card__image" loading="lazy" src="' +
-            escapeHtml(item.image.url) +
-            '" alt="' +
-            escapeHtml(item.image.alt || item.title || "") +
-            '">'
-          : "";
-      var article = document.createElement("article");
-      article.className = "service-card";
-      article.innerHTML = [
-        '<div class="service-card__media' +
-          (image ? " service-card__media--image" : "") +
-          '">' +
-          image +
-          "</div>",
-        '<h3 class="service-card__title">' + escapeHtml(item.title) + "</h3>",
-        '<p class="service-card__text">' +
-          escapeHtml(item.description) +
-          "</p>",
-      ].join("");
-      container.appendChild(article);
-    });
-  }
-
-  function renderHeroVisual(content) {
-    var container = document.getElementById("hero-visual-slot");
-    if (!container) return;
-    container.innerHTML = "";
-
-    if (
-      !content.media ||
-      !content.media.heroImage ||
-      !content.media.heroImage.url
-    ) {
-      return;
-    }
-
-    container.innerHTML = [
-      '<div class="hero-visual">',
-      '  <div class="hero-visual__main-card">',
-      '    <img class="hero-visual__image" fetchpriority="high" src="' +
-        escapeHtml(content.media.heroImage.url) +
-        '" alt="' +
-        escapeHtml(content.media.heroImage.alt || "") +
-        '">',
-      "  </div>",
-      '  <div class="hero-visual__floating-card">',
-      '    <p class="hero-visual__label">Lokalt fokus</p>',
-      '    <p class="hero-visual__value">' +
-        escapeHtml(content.site.displayName) +
-        "</p>",
-      '    <p class="hero-visual__caption">' +
-        escapeHtml(content.contact.address) +
-        "</p>",
-      "  </div>",
-      "</div>",
-    ].join("");
-  }
-
-  function renderIntro(content) {
-    var section = document.getElementById("intro-section");
-    if (!section) return;
-    var visible =
-      isSectionEnabled(content, "intro") &&
-      (hasText(content.intro && content.intro.heading) ||
-        hasText(content.intro && content.intro.body));
-    section.hidden = !visible;
-    if (!visible) return;
-    setText("intro-eyebrow", sectionEyebrow(content, "intro", "Introduktion"));
-    setText("intro-heading", content.intro.heading);
-    setText("intro-body", content.intro.body);
-  }
-
-  function renderAboutVisual(content) {
-    var container = document.getElementById("about-visual-slot");
-    if (!container) return;
-
-    var imageBlock = "";
-    if (
-      content.media &&
-      content.media.aboutImage &&
-      content.media.aboutImage.url
-    ) {
-      imageBlock = [
-        '<div class="about-media__image-frame">',
-        '  <img class="about-media__image" loading="lazy" src="' +
-          escapeHtml(content.media.aboutImage.url) +
-          '" alt="' +
-          escapeHtml(content.media.aboutImage.alt || "") +
-          '">',
-        "</div>",
-      ].join("");
-    }
-
-    var uspEnabled = isSectionEnabled(content, "usp");
-    var uspItems = (
-      uspEnabled && content.usp && Array.isArray(content.usp.items)
-        ? content.usp.items
-        : []
-    )
-      .filter(function (item) {
-        return hasText(item);
-      })
-      .map(function (item) {
-        return '<li class="usp-list__item">' + escapeHtml(item) + "</li>";
-      })
-      .join("");
-
-    var hasHighlight =
-      uspEnabled && (uspItems || hasText(content.usp && content.usp.heading));
-
-    container.innerHTML = [
-      '<div class="about-media">',
-      imageBlock,
-      hasHighlight
-        ? '  <div class="highlight-panel">' +
-          '    <p class="highlight-panel__label">' +
-          escapeHtml((content.usp && content.usp.heading) || "") +
-          "</p>" +
-          '    <ul class="usp-list">' +
-          uspItems +
-          "</ul>" +
-          "  </div>"
-        : "",
-      "</div>",
-    ].join("");
-  }
-
-  function renderAbout(content) {
-    var section = document.getElementById("about");
-    var navLink = document.getElementById("about-nav-link");
-    var hasAboutText =
-      hasText(content.about && content.about.heading) ||
-      hasText(content.about && content.about.body);
-    var hasAboutMedia = Boolean(
-      content.media && content.media.aboutImage && content.media.aboutImage.url,
-    );
-    var hasUspContent =
-      isSectionEnabled(content, "usp") &&
-      (hasText(content.usp && content.usp.heading) ||
-        hasVisibleItems(content.usp && content.usp.items));
-    var visible =
-      isSectionEnabled(content, "about") &&
-      (hasAboutText || hasAboutMedia || hasUspContent);
-    if (section) section.hidden = !visible;
-    if (navLink) navLink.hidden = !visible;
-    if (!visible) return;
-
-    setText("about-eyebrow", sectionEyebrow(content, "about", "Om oss"));
-    setText("about-heading", content.about.heading);
-    setText("about-body", content.about.body);
-    renderAboutVisual(content);
-  }
-
-  function renderTestimonials(content) {
-    var section = document.getElementById("testimonials-section");
-    var list = document.getElementById("testimonials-list");
-    if (!section || !list) return;
-
-    var items = (
-      content.testimonials && Array.isArray(content.testimonials.items)
-        ? content.testimonials.items
-        : []
-    ).filter(function (item) {
-      return item && (hasText(item.name) || hasText(item.quote));
-    });
-    var visible = Boolean(
-      content.testimonials &&
-      content.testimonials.enabled !== false &&
-      items.length > 0,
-    );
-    section.hidden = !visible;
-    list.innerHTML = "";
-    if (!visible) return;
-
-    setText(
-      "testimonials-eyebrow",
-      sectionEyebrow(content, "testimonials", "Omdömen"),
-    );
-    setText("testimonials-heading", content.testimonials.heading);
-    list.innerHTML = items
-      .map(function (item) {
-        return [
-          '<article class="testimonial-card">',
-          '  <h3 class="testimonial-card__name">' +
-            escapeHtml(item.name) +
-            "</h3>",
-          '  <p class="testimonial-card__text">"' +
-            escapeHtml(item.quote) +
-            '"</p>',
-          "</article>",
-        ].join("");
-      })
-      .join("");
-  }
-
-  function renderFaq(content) {
-    var section = document.getElementById("faq");
-    var list = document.getElementById("faq-list");
-    if (!section || !list) return;
-
-    var items = (
-      content.faq && Array.isArray(content.faq.items) ? content.faq.items : []
-    ).filter(function (item) {
-      return item && (hasText(item.question) || hasText(item.answer));
-    });
-    var visible = Boolean(
-      content.faq && content.faq.enabled !== false && items.length > 0,
-    );
-    section.hidden = !visible;
-    list.innerHTML = "";
-    if (!visible) return;
-
-    setText("faq-eyebrow", sectionEyebrow(content, "faq", "FAQ"));
-    setText("faq-heading", content.faq.heading);
-    list.innerHTML = items
-      .map(function (item) {
-        return [
-          '<article class="faq-item">',
-          '  <h3 class="faq-item__question">' +
-            escapeHtml(item.question) +
-            "</h3>",
-          '  <p class="faq-item__answer">' + escapeHtml(item.answer) + "</p>",
-          "</article>",
-        ].join("");
-      })
-      .join("");
-  }
-
-  function renderGallery(content) {
-    var section = document.getElementById("gallery");
-    var navLink = document.getElementById("gallery-nav-link");
-    var grid = document.getElementById("gallery-grid");
-    if (!section || !navLink || !grid) return;
-
-    var galleryItems = (
-      content.media && Array.isArray(content.media.gallery)
-        ? content.media.gallery
-        : []
-    ).filter(function (item) {
-      return item && item.url;
-    });
-
-    var visible = Boolean(
-      content.media &&
-      content.media.galleryEnabled !== false &&
-      galleryItems.length > 0,
-    );
-    section.hidden = !visible;
-    navLink.hidden = !visible;
-    grid.innerHTML = "";
-
-    if (!visible) {
-      return;
-    }
-
-    setText(
-      "gallery-eyebrow",
-      (content.media && content.media.galleryEyebrow) || "Bilder",
-    );
-    setText(
-      "gallery-heading",
-      (content.media && content.media.galleryHeading) ||
-        "Inblick i verksamheten",
-    );
-    grid.innerHTML = galleryItems
-      .map(function (item) {
-        return [
-          '<figure class="gallery-card">',
-          '  <img class="gallery-card__image" loading="lazy" src="' +
-            escapeHtml(item.url) +
-            '" alt="' +
-            escapeHtml(item.alt || "") +
-            '">',
-          "</figure>",
-        ].join("");
-      })
-      .join("");
-  }
-
-  function renderContact(content) {
-    var section = document.getElementById("contact");
-    var visible =
-      isSectionEnabled(content, "contact") &&
-      (hasText(content.contact && content.contact.heading) ||
-        hasText(content.contact && content.contact.body) ||
-        hasText(content.contact && content.contact.phone) ||
-        hasText(content.contact && content.contact.email) ||
-        hasText(content.contact && content.contact.address));
-    setHidden("contact", !visible);
-    setLink(
-      "nav-cta-link",
-      content.hero && content.hero.primaryCtaHref,
-      content.hero && content.hero.primaryCtaLabel,
-      visible && hasText(content.hero && content.hero.primaryCtaLabel),
-    );
-    setLink(
-      "hero-primary-cta",
-      content.hero && content.hero.primaryCtaHref,
-      content.hero && content.hero.primaryCtaLabel,
-      visible && hasText(content.hero && content.hero.primaryCtaLabel),
-    );
-    if (!section || !visible) return;
-
-    setText("contact-eyebrow", sectionEyebrow(content, "contact", "Kontakt"));
-    setText("contact-heading", content.contact.heading);
-    setText("contact-body", content.contact.body);
-    setLink(
-      "contact-phone",
-      "tel:" +
-        String((content.contact && content.contact.phone) || "").replace(
-          /\s+/g,
-          "",
-        ),
-      content.contact.phone,
-      hasText(content.contact.phone),
-    );
-    setLink(
-      "contact-email",
-      "mailto:" + ((content.contact && content.contact.email) || ""),
-      content.contact.email,
-      hasText(content.contact.email),
-    );
-    setText("contact-address", content.contact.address);
-  }
-
-  function renderSocialLinks(content) {
-    var container = document.getElementById("social-links");
-    if (!container) return;
-
-    var entries = Object.entries(
-      (content.footer && content.footer.socialLinks) || {},
-    ).filter(function (entry) {
-      return Boolean(entry[1]);
-    });
-
-    if (!entries.length) {
-      container.innerHTML =
-        '<span class="site-footer__meta">Inga sociala länkar angivna.</span>';
-      return;
-    }
-
-    container.innerHTML = entries
-      .map(function (entry) {
-        return (
-          '<a class="site-footer__social-link" href="' +
-          escapeHtml(entry[1]) +
-          '" target="_blank" rel="noreferrer">' +
-          escapeHtml(entry[0]) +
-          "</a>"
-        );
-      })
-      .join("");
-  }
-
-  function applySeo(content) {
-    document.documentElement.lang = content.site.language || "sv";
-    document.title = content.seo.title || "";
-    setMeta('meta[name="description"]', content.seo.description || "");
-    setMeta(
-      'meta[property="og:locale"]',
-      localeFromLanguage(content.site.language),
-    );
-    setMeta('meta[property="og:title"]', content.seo.title || "");
-    setMeta('meta[property="og:description"]', content.seo.description || "");
-    setMeta(
-      'meta[property="og:image"]',
-      (content.media &&
-        content.media.heroImage &&
-        content.media.heroImage.url) ||
-        "",
-    );
-    setMeta('meta[name="twitter:title"]', content.seo.title || "");
-    setMeta('meta[name="twitter:description"]', content.seo.description || "");
-    setMeta(
-      'meta[name="twitter:image"]',
-      (content.media &&
-        content.media.heroImage &&
-        content.media.heroImage.url) ||
-        "",
-    );
-  }
-
-  function applyContent(content) {
-    setThemeMode(content.site && content.site.themeMode);
-    setDesignSettings(content);
-    applySeo(content);
-    createBrand(
-      "header-brand",
-      content.site.displayName,
-      content.media && content.media.logoUrl,
-      {
-        logoOnly: Boolean(content.media && content.media.headerLogoOnly),
-        logoWidth: content.media && content.media.logoWidth,
-      },
-    );
-    createBrand(
-      "footer-brand",
-      content.footer.companyName,
-      content.media && content.media.logoUrl,
-      {
-        logoWidth: content.media && content.media.logoWidth,
-      },
-    );
-    setHidden("top", content.hero && content.hero.enabled === false);
-    setHidden(
-      "site-footer",
-      content.footer && content.footer.enabled === false,
-    );
-    setText("hero-eyebrow", content.hero.eyebrow);
-    setText("hero-headline", content.hero.headline);
-    setText("hero-subheadline", content.hero.subheadline);
-    setText("footer-tagline", content.footer.tagline);
-    setText("footer-copyright", content.footer.copyright);
-
-    renderHeroVisual(content);
-    renderIntro(content);
-    renderServices(content);
-    renderAbout(content);
-    renderTestimonials(content);
-    renderFaq(content);
-    renderGallery(content);
-    renderContact(content);
-    renderSocialLinks(content);
-  }
-
-  window.__contentCreatorApplyContent = applyContent;
+  /* ------------------------------------------------------------------------ */
+  /* Mobile navigation                                                        */
+  /* ------------------------------------------------------------------------ */
 
   function setupNavigation() {
     if (!navToggle || !siteNavigation) {
       return;
     }
 
-    navToggle.addEventListener("click", function () {
-      var isOpen = siteNavigation.classList.toggle("is-open");
-      navToggle.setAttribute("aria-expanded", String(isOpen));
+    function isOpen() {
+      return siteNavigation.classList.contains("is-open");
+    }
+
+    function openNavigation() {
+      siteNavigation.classList.add("is-open");
+
+      navToggle.setAttribute("aria-expanded", "true");
+    }
+
+    function closeNavigation(returnFocus) {
+      siteNavigation.classList.remove("is-open");
+
+      navToggle.setAttribute("aria-expanded", "false");
+
+      if (returnFocus) {
+        navToggle.focus();
+      }
+    }
+
+    function toggleNavigation() {
+      if (isOpen()) {
+        closeNavigation(false);
+      } else {
+        openNavigation();
+      }
+    }
+
+    /* Initial ARIA state */
+
+    navToggle.setAttribute("aria-expanded", isOpen() ? "true" : "false");
+
+    /* Menu button */
+
+    navToggle.addEventListener("click", function (event) {
+      event.stopPropagation();
+
+      toggleNavigation();
     });
+
+    /* Close after navigation */
 
     siteNavigation.querySelectorAll("a").forEach(function (link) {
       link.addEventListener("click", function () {
-        siteNavigation.classList.remove("is-open");
-        navToggle.setAttribute("aria-expanded", "false");
+        closeNavigation(false);
       });
     });
+
+    /* Escape closes menu */
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && isOpen()) {
+        closeNavigation(true);
+      }
+    });
+
+    /* Click outside closes menu */
+
+    document.addEventListener("click", function (event) {
+      if (!isOpen()) {
+        return;
+      }
+
+      var clickedInsideNavigation = siteNavigation.contains(event.target);
+
+      var clickedToggle = navToggle.contains(event.target);
+
+      if (!clickedInsideNavigation && !clickedToggle) {
+        closeNavigation(false);
+      }
+    });
+
+    /*
+     * Clear mobile open state when moving to desktop layout.
+     */
+
+    var desktopMediaQuery = window.matchMedia("(min-width: 921px)");
+
+    function handleViewportChange(event) {
+      if (event.matches) {
+        closeNavigation(false);
+      }
+    }
+
+    if (typeof desktopMediaQuery.addEventListener === "function") {
+      desktopMediaQuery.addEventListener("change", handleViewportChange);
+    } else if (typeof desktopMediaQuery.addListener === "function") {
+      desktopMediaQuery.addListener(handleViewportChange);
+    }
   }
+
+  /* ------------------------------------------------------------------------ */
+  /* Init                                                                     */
+  /* ------------------------------------------------------------------------ */
 
   var embeddedContent = readEmbeddedContent();
+
   if (embeddedContent) {
-    applyContent(embeddedContent);
+    applyDesignSettings(embeddedContent);
   }
 
-  fetch("content/home.json")
-    .then(function (response) {
-      if (!response.ok) {
-        throw new Error("Kunde inte ladda innehåll.");
-      }
-      return response.json();
-    })
-    .then(function (content) {
-      applyContent(content);
-      setupNavigation();
-    })
-    .catch(function (error) {
-      console.warn("Falling back to embedded content", error);
-      if (!embeddedContent) {
-        document.title = "Kunde inte ladda webbplatsen";
-        setText("hero-headline", "Kunde inte ladda webbplatsen");
-        setText("hero-subheadline", "Innehållsfilen kunde inte läsas in.");
-      }
-      setupNavigation();
-    });
+  setupNavigation();
 })();
