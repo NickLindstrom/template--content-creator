@@ -6,6 +6,7 @@ const projectRoot = path.resolve(__dirname, "..");
 const contentPath = path.join(projectRoot, "content", "home.json");
 const defaultTemplatePath = path.join(projectRoot, "src", "template.html");
 const outputPath = path.join(projectRoot, "index.html");
+const indexJsPath = path.join(projectRoot, "index.js");
 
 /* -------------------------------------------------------------------------- */
 /* Helpers                                                                    */
@@ -57,6 +58,17 @@ function createCspHash(value) {
   return `'sha256-${hash}'`;
 }
 
+function createFileIntegrity(filePath) {
+  const fileContents = fs.readFileSync(filePath);
+
+  const hash = crypto
+    .createHash("sha256")
+    .update(fileContents)
+    .digest("base64");
+
+  return `sha256-${hash}`;
+}
+
 function sanitizeCspSources(values) {
   if (!Array.isArray(values)) {
     return [];
@@ -72,7 +84,11 @@ function sanitizeCspSources(values) {
   );
 }
 
-function buildCsp(content, inlineScriptBodies = []) {
+function buildCsp(
+  content,
+  inlineScriptBodies = [],
+  externalScriptIntegrities = [],
+) {
   const config = content.security?.csp || {};
 
   if (config.enabled === false) {
@@ -80,24 +96,31 @@ function buildCsp(content, inlineScriptBodies = []) {
   }
 
   /*
-   * Script
+   * 'self' behålls som fallback för browsers utan full CSP3-support.
    *
-   * 'self' tillåter index.js.
-   * Hasharna tillåter exakt de inline-block som build.js känner till.
-   * Ingen unsafe-inline och ingen unsafe-eval.
+   * Moderna browsers använder SHA-256-hashen tillsammans med
+   * 'strict-dynamic'.
    */
-
   const scriptSources = [
     "'self'",
-    ...inlineScriptBodies.filter((body) => hasText(body)).map(createCspHash),
-  ];
 
-  /*
-   * Bilder
-   */
+    ...externalScriptIntegrities
+      .filter((integrity) => hasText(integrity))
+      .map((integrity) => `'${integrity}'`),
+
+    ...inlineScriptBodies.filter((body) => hasText(body)).map(createCspHash),
+
+    "'strict-dynamic'",
+  ];
 
   const imageSources = ["'self'", "data:", "blob:"];
 
+  /*
+   * Standard: tillåt bilder från valfri HTTPS-källa.
+   *
+   * Sätt allowAnyHttpsImages: false i home.json om ett projekt
+   * istället ska använda en strikt domänlista.
+   */
   if (config.allowAnyHttpsImages !== false) {
     imageSources.push("https:");
   }
@@ -129,6 +152,23 @@ function buildCsp(content, inlineScriptBodies = []) {
   ];
 
   return directives.join("; ");
+}
+
+function setScriptIntegrity(html, src, integrity) {
+  const escapedSrc = escapeRegExp(src);
+
+  const scriptRegex = new RegExp(
+    `<script\\b(?=[^>]*\\bsrc\\s*=\\s*(["'])(?:\\./)?${escapedSrc}\\1)[^>]*>`,
+    "i",
+  );
+
+  if (!scriptRegex.test(html)) {
+    throw new Error(`Kunde inte hitta <script src="${src}"> i vald template.`);
+  }
+
+  return html.replace(scriptRegex, (tag) =>
+    setTagAttribute(tag, "integrity", integrity),
+  );
 }
 
 function readJson(filePath) {
@@ -207,15 +247,14 @@ function resolvePageUrl(content) {
   }
 
   /*
-   * GitHub Actions exposes GITHUB_REPOSITORY as:
+   * GitHub Actions:
    *
-   * owner/repository
+   * GITHUB_REPOSITORY = owner/repository
    *
-   * That lets us derive a GitHub Pages project URL:
+   * Ger:
    *
    * https://owner.github.io/repository/
    */
-
   if (hasText(process.env.GITHUB_REPOSITORY)) {
     const [owner, repository] = process.env.GITHUB_REPOSITORY.split("/");
 
@@ -248,7 +287,7 @@ function absoluteUrl(value, pageUrl) {
     }
 
     return new URL(value, pageUrl).href;
-  } catch (error) {
+  } catch {
     return "";
   }
 }
@@ -261,7 +300,9 @@ function findElementById(html, id) {
   const escapedId = escapeRegExp(id);
 
   const openingRegex = new RegExp(
-    `<([a-zA-Z][\\w:-]*)\\b[^>]*\\bid\\s*=\\s*(["'])${escapedId}\\2[^>]*>`,
+    `<([a-zA-Z][\\w:-]*)\\b` +
+      `[^>]*\\bid\\s*=\\s*` +
+      `(["'])${escapedId}\\2[^>]*>`,
     "i",
   );
 
@@ -322,7 +363,8 @@ function replaceInnerById(html, id, innerHtml) {
 
 function setTagAttribute(tag, attributeName, value) {
   const attributeRegex = new RegExp(
-    `\\s${escapeRegExp(attributeName)}\\s*=\\s*(?:"[^"]*"|'[^']*'|[^\\s>]+)`,
+    `\\s${escapeRegExp(attributeName)}\\s*=\\s*` +
+      `(?:"[^"]*"|'[^']*'|[^\\s>]+)`,
     "i",
   );
 
@@ -332,14 +374,19 @@ function setTagAttribute(tag, attributeName, value) {
 
   cleaned = cleaned.replace(/\s*\/?>$/, "");
 
-  return `${cleaned} ${attributeName}="${escapeHtml(value)}"${
-    selfClosing ? " />" : ">"
-  }`;
+  return (
+    `${cleaned} ` +
+    `${attributeName}=` +
+    `"${escapeHtml(value)}"` +
+    `${selfClosing ? " />" : ">"}`
+  );
 }
 
 function removeTagAttribute(tag, attributeName) {
   const attributeRegex = new RegExp(
-    `\\s${escapeRegExp(attributeName)}(?:\\s*=\\s*(?:"[^"]*"|'[^']*'|[^\\s>]+))?`,
+    `\\s${escapeRegExp(attributeName)}` +
+      `(?:\\s*=\\s*` +
+      `(?:"[^"]*"|'[^']*'|[^\\s>]+))?`,
     "i",
   );
 
@@ -392,9 +439,9 @@ function setLink(html, id, href, label) {
 
 function setMeta(html, attributeName, attributeValue, content) {
   const regex = new RegExp(
-    `<meta\\b[^>]*\\b${escapeRegExp(attributeName)}\\s*=\\s*(["'])${escapeRegExp(
-      attributeValue,
-    )}\\1[^>]*>`,
+    `<meta\\b[^>]*\\b` +
+      `${escapeRegExp(attributeName)}\\s*=\\s*` +
+      `(["'])${escapeRegExp(attributeValue)}\\1[^>]*>`,
     "i",
   );
 
@@ -416,7 +463,10 @@ function upsertHeadLink(html, rel, href) {
   }
 
   const regex = new RegExp(
-    `<link\\b(?=[^>]*\\brel\\s*=\\s*(["'])${escapeRegExp(rel)}\\1)[^>]*>`,
+    `<link\\b` +
+      `(?=[^>]*\\brel\\s*=\\s*` +
+      `(["'])${escapeRegExp(rel)}\\1)` +
+      `[^>]*>`,
     "i",
   );
 
@@ -944,7 +994,9 @@ function buildJsonLd(content, pageUrl) {
 
 function upsertJsonLd(html, jsonLdBody) {
   const scriptTag =
-    `<script id="site-json-ld" type="application/ld+json">` +
+    `<script ` +
+    `id="site-json-ld" ` +
+    `type="application/ld+json">` +
     `${jsonLdBody}` +
     `</script>`;
 
@@ -1003,13 +1055,41 @@ function renderPage(content) {
     throw new Error(`Template hittades inte: ${templatePath}`);
   }
 
+  if (!fs.existsSync(indexJsPath)) {
+    throw new Error(`index.js hittades inte: ${indexJsPath}`);
+  }
+
   let html = fs.readFileSync(templatePath, "utf8");
 
   const pageUrl = resolvePageUrl(content);
 
+  /*
+   * Generera inline-blocken exakt en gång.
+   *
+   * CSP-hasharna beräknas sedan från exakt
+   * samma strängar som hamnar i HTML.
+   */
   const initialContentBody = `\n${safeJsonForHtml(content)}\n`;
 
   const jsonLdBody = `\n${safeJsonForHtml(buildJsonLd(content, pageUrl))}\n`;
+
+  /*
+   * 1. SHA-256 på index.js
+   */
+  const indexJsIntegrity = createFileIntegrity(indexJsPath);
+
+  /*
+   * 2. Lägg SRI på script-taggen.
+   *
+   * Exempel på genererat resultat:
+   *
+   * <script
+   *   defer
+   *   src="index.js"
+   *   integrity="sha256-AbCd..."
+   * ></script>
+   */
+  html = setScriptIntegrity(html, "index.js", indexJsIntegrity);
 
   /* SEO + structured data */
 
@@ -1286,20 +1366,31 @@ function renderPage(content) {
   html = setHiddenById(html, "site-footer", content.footer?.enabled === false);
 
   /*
-   * Embedded JSON is kept only for lightweight frontend configuration:
-   *
-   * - theme mode
-   * - colours
-   * - fonts
-   * - image ratio
-   *
-   * index.js no longer renders content.
+   * Embedded JSON finns kvar endast för de
+   * visuella frontendinställningarna som
+   * index.js använder.
    */
-
   html = replaceInnerById(html, "initial-content", initialContentBody);
-  const cspPolicy = buildCsp(content, [initialContentBody, jsonLdBody]);
+
+  /*
+   * 3. Generera strict CSP.
+   *
+   * indexJsIntegrity används både i:
+   *
+   * integrity="sha256-..."
+   *
+   * och:
+   *
+   * script-src 'sha256-...' 'strict-dynamic'
+   */
+  const cspPolicy = buildCsp(
+    content,
+    [initialContentBody, jsonLdBody],
+    [indexJsIntegrity],
+  );
 
   html = upsertCspMeta(html, cspPolicy);
+
   return html;
 }
 
@@ -1324,6 +1415,10 @@ function renderPage(content) {
   console.log("JSON-LD: genererad statiskt");
 
   console.log("Öppettider: genererade statiskt");
+
+  console.log("CSP: genererad statiskt");
+
+  console.log("index.js: SHA-256 + SRI genererad");
 
   console.log("");
 })();
