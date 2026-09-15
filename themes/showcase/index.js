@@ -248,18 +248,28 @@
     var sameAs = Object.values(footer.socialLinks || {}).filter(function (value) {
       return hasText(value);
     });
-    var openingHoursSpecification = ((content.openingHours && content.openingHours.days) || [])
-      .filter(function (item) {
-        return item && item.closed !== true && hasText(item.opens) && hasText(item.closes);
-      })
-      .map(function (item) {
-        return {
-          "@type": "OpeningHoursSpecification",
-          dayOfWeek: schemaDayNames[item.day] || item.day,
-          opens: item.opens,
-          closes: item.closes
-        };
-      });
+    var openingHours = content.openingHours || {};
+    var openingHoursSpecification = openingHours.alwaysOpen === true
+      ? Object.keys(schemaDayNames).map(function (day) {
+          return {
+            "@type": "OpeningHoursSpecification",
+            dayOfWeek: schemaDayNames[day],
+            opens: "00:00",
+            closes: "23:59"
+          };
+        })
+      : ((openingHours.days) || [])
+        .filter(function (item) {
+          return item && item.closed !== true && hasText(item.opens) && hasText(item.closes);
+        })
+        .map(function (item) {
+          return {
+            "@type": "OpeningHoursSpecification",
+            dayOfWeek: schemaDayNames[item.day] || item.day,
+            opens: item.opens,
+            closes: item.closes
+          };
+        });
 
     var graph = [
       {
@@ -276,6 +286,7 @@
         logo: logoUrl,
         image: [heroImageUrl].concat(galleryImages).filter(Boolean),
         sameAs: sameAs,
+        openingHours: openingHours.alwaysOpen === true ? "Mo-Su 00:00-23:59" : undefined,
         openingHoursSpecification: openingHoursSpecification,
         makesOffer: serviceOffers
       },
@@ -589,10 +600,13 @@
 
     var openingHours = content.openingHours || {};
     var days = Array.isArray(openingHours.days) ? openingHours.days : [];
+    var hasAnyTime = days.some(function (item) {
+      return item && (hasText(item.opens) || hasText(item.closes));
+    });
     var visibleDays = days.filter(function (item) {
       return item && (item.closed === true || hasText(item.opens) || hasText(item.closes));
     });
-    var visible = openingHours.enabled !== false && visibleDays.length > 0;
+    var visible = openingHours.enabled !== false && (openingHours.alwaysOpen === true || (hasAnyTime && visibleDays.length > 0));
 
     if (section) section.hidden = !visible;
     list.innerHTML = "";
@@ -601,7 +615,9 @@
     setText("opening-hours-eyebrow", sectionEyebrow(content, "openingHours", "Öppettider"));
     setText("opening-hours-heading", openingHours.heading || "Öppettider");
     setText("opening-hours-body", openingHours.body || "");
-    list.innerHTML = visibleDays
+    list.innerHTML = openingHours.alwaysOpen === true
+      ? '<div class="opening-hours-row"><span class="opening-hours-row__day">Öppettider</span><span class="opening-hours-row__time">Alltid öppet</span></div>'
+      : visibleDays
       .map(function (item) {
         var timeLabel = item.closed === true
           ? "Stängt"

@@ -746,6 +746,14 @@ function renderBrand(content, footer = false) {
 }
 
 function renderOpeningHoursDays(days = []) {
+  const hasAnyTime = days.some(
+    (item) => item && (hasText(item.opens) || hasText(item.closes)),
+  );
+
+  if (!hasAnyTime) {
+    return "";
+  }
+
   return days
     .filter(
       (item) =>
@@ -879,25 +887,32 @@ function buildJsonLd(content, pageUrl) {
     ),
   );
 
-  const openingHoursSpecification = Array.isArray(openingHours.days)
-    ? openingHours.days
-        .filter(
-          (item) =>
-            item &&
-            item.closed !== true &&
-            hasText(item.opens) &&
-            hasText(item.closes),
-        )
-        .map((item) => ({
-          "@type": "OpeningHoursSpecification",
+  const openingHoursSpecification = openingHours.alwaysOpen === true
+    ? Object.values(schemaDayNames).map((dayOfWeek) => ({
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek,
+        opens: "00:00",
+        closes: "23:59",
+      }))
+    : Array.isArray(openingHours.days)
+      ? openingHours.days
+          .filter(
+            (item) =>
+              item &&
+              item.closed !== true &&
+              hasText(item.opens) &&
+              hasText(item.closes),
+          )
+          .map((item) => ({
+            "@type": "OpeningHoursSpecification",
 
-          dayOfWeek: schemaDayNames[item.day] || item.day,
+            dayOfWeek: schemaDayNames[item.day] || item.day,
 
-          opens: item.opens,
+            opens: item.opens,
 
-          closes: item.closes,
-        }))
-    : [];
+            closes: item.closes,
+          }))
+      : [];
 
   const businessType = hasText(site.schemaType)
     ? site.schemaType
@@ -942,6 +957,8 @@ function buildJsonLd(content, pageUrl) {
       image: [heroImageUrl].concat(galleryImages).filter(Boolean),
 
       sameAs,
+
+      openingHours: openingHours.alwaysOpen === true ? "Mo-Su 00:00-23:59" : undefined,
 
       openingHoursSpecification,
 
@@ -1338,10 +1355,12 @@ function renderPage(content) {
     ? openingHours.days
     : [];
 
-  const openingHoursHtml = renderOpeningHoursDays(openingHourDays);
+  const openingHoursHtml = openingHours.alwaysOpen === true
+    ? '<div class="opening-hours-row"><span class="opening-hours-row__day">Öppettider</span><span class="opening-hours-row__time">Alltid öppet</span></div>'
+    : renderOpeningHoursDays(openingHourDays);
 
   const openingHoursVisible =
-    openingHours.enabled !== false && hasText(openingHoursHtml);
+    openingHours.enabled !== false && (openingHours.alwaysOpen === true || hasText(openingHoursHtml));
 
   html = setText(
     html,
