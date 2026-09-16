@@ -593,6 +593,67 @@
       .join("");
   }
 
+  function getHeroButtons(content) {
+    var hero = content && content.hero ? content.hero : {};
+    if (Array.isArray(hero.buttons)) {
+      return hero.buttons.filter(function (button) {
+        return button && hasText(button.label) && hasText(button.target);
+      });
+    }
+
+    return hasText(hero.primaryCtaLabel)
+      ? [{
+          label: hero.primaryCtaLabel,
+          variant: "primary",
+          linkType: String(hero.primaryCtaHref || "").indexOf("#") === 0 ? "section" : "external",
+          target: String(hero.primaryCtaHref || "#contact").replace(/^#/, ""),
+        }]
+      : [];
+  }
+
+  function heroButtonHref(button) {
+    return button.linkType === "external"
+      ? button.target
+      : "#" + String(button.target || "").replace(/^#/, "");
+  }
+
+  function renderHeroButtons(content) {
+    var container = document.getElementById("hero-actions");
+    var buttons = getHeroButtons(content);
+    var allowedVariants = ["primary", "secondary", "ghost", "secondary-ghost"];
+
+    if (container) {
+      container.innerHTML = "";
+      buttons.forEach(function (button, index) {
+        var link = document.createElement("a");
+        var variant = allowedVariants.indexOf(button.variant) >= 0 ? button.variant : "primary";
+        link.className = "showcase-button showcase-button--" + variant;
+        link.href = heroButtonHref(button);
+        link.textContent = button.label;
+        if (index === 0) link.id = "hero-primary-cta";
+        if (button.linkType === "external") {
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+        }
+        container.appendChild(link);
+      });
+    }
+
+    if (buttons.length) {
+      setLink("nav-cta-link", heroButtonHref(buttons[0]), buttons[0].label, true);
+      var navLink = document.getElementById("nav-cta-link");
+      if (navLink && buttons[0].linkType === "external") {
+        navLink.target = "_blank";
+        navLink.rel = "noopener noreferrer";
+      } else if (navLink) {
+        navLink.removeAttribute("target");
+        navLink.removeAttribute("rel");
+      }
+    } else {
+      setLink("nav-cta-link", "#", "", false);
+    }
+  }
+
   function renderOpeningHours(content) {
     var section = document.getElementById("opening-hours");
     var list = document.getElementById("opening-hours-list");
@@ -691,18 +752,6 @@
       hasText(content.contact && content.contact.email) ||
       hasText(content.contact && content.contact.address);
     setHidden("contact", !visible);
-    setLink(
-      "nav-cta-link",
-      content.hero && content.hero.primaryCtaHref,
-      content.hero && content.hero.primaryCtaLabel,
-      visible && hasText(content.hero && content.hero.primaryCtaLabel),
-    );
-    setLink(
-      "hero-primary-cta",
-      content.hero && content.hero.primaryCtaHref,
-      content.hero && content.hero.primaryCtaLabel,
-      visible && hasText(content.hero && content.hero.primaryCtaLabel),
-    );
     if (!section || !visible) return;
 
     setText("contact-heading", content.contact.heading);
@@ -810,6 +859,7 @@
     setText("footer-copyright", content.footer.copyright);
 
     renderHeroVisual(content);
+    renderHeroButtons(content);
     renderIntro(content);
     renderServices(content);
     renderAbout(content);

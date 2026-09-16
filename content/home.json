@@ -22,7 +22,15 @@
     "headline": "Trygg hjälp med elinstallationer och service",
     "subheadline": "Vi hjälper privatpersoner och företag med säkra, smidiga och professionella ellösningar i Stockholm.",
     "primaryCtaLabel": "Begär offert",
-    "primaryCtaHref": "#contact"
+    "primaryCtaHref": "#contact",
+    "buttons": [
+      {
+        "label": "Begär offert",
+        "variant": "primary",
+        "linkType": "section",
+        "target": "contact"
+      }
+    ]
   },
   "intro": {
     "heading": "Din lokala expert",

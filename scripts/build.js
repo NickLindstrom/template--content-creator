@@ -523,6 +523,61 @@ function renderServices(items = []) {
     .join("");
 }
 
+function getHeroButtons(content) {
+  const hero = content.hero || {};
+  const buttons = Array.isArray(hero.buttons)
+    ? hero.buttons
+    : hasText(hero.primaryCtaLabel)
+      ? [{
+          label: hero.primaryCtaLabel,
+          variant: "primary",
+          linkType: String(hero.primaryCtaHref || "").startsWith("#") ? "section" : "external",
+          target: String(hero.primaryCtaHref || "#contact").replace(/^#/, ""),
+        }]
+      : [];
+
+  return buttons.filter(
+    (button) => button && hasText(button.label) && hasText(button.target),
+  );
+}
+
+function getHeroButtonHref(button) {
+  return button.linkType === "external"
+    ? button.target
+    : `#${String(button.target || "").replace(/^#/, "")}`;
+}
+
+function renderHeroButtons(content) {
+  const theme = content.site?.theme || "classic";
+  const classPrefix =
+    theme === "editorial"
+      ? "editorial-button editorial-button--"
+      : theme === "showcase"
+        ? "showcase-button showcase-button--"
+        : "button button--";
+  const allowedVariants = new Set([
+    "primary",
+    "secondary",
+    "ghost",
+    "secondary-ghost",
+  ]);
+
+  return getHeroButtons(content)
+    .map((button, index) => {
+      const variant = allowedVariants.has(button.variant)
+        ? button.variant
+        : "primary";
+      const externalAttributes =
+        button.linkType === "external"
+          ? ' target="_blank" rel="noopener noreferrer"'
+          : "";
+      const id = index === 0 ? ' id="hero-primary-cta"' : "";
+
+      return `<a${id} class="${classPrefix}${variant}" href="${escapeHtml(getHeroButtonHref(button))}"${externalAttributes}>${escapeHtml(button.label)}</a>`;
+    })
+    .join("");
+}
+
 function renderHeroVisual(content) {
   const image = content.media?.heroImage;
 
@@ -1144,19 +1199,24 @@ function renderPage(content) {
 
   html = setText(html, "hero-subheadline", content.hero?.subheadline);
 
-  html = setLink(
-    html,
-    "hero-primary-cta",
-    content.hero?.primaryCtaHref || "#contact",
-    content.hero?.primaryCtaLabel || "Kontakta oss",
-  );
+  const heroButtons = getHeroButtons(content);
+  const firstHeroButton = heroButtons[0];
 
-  html = setLink(
-    html,
-    "nav-cta-link",
-    content.hero?.primaryCtaHref || "#contact",
-    content.hero?.primaryCtaLabel || "Kontakt",
-  );
+  html = replaceInnerById(html, "hero-actions", renderHeroButtons(content));
+
+  if (firstHeroButton) {
+    html = setLink(
+      html,
+      "nav-cta-link",
+      getHeroButtonHref(firstHeroButton),
+      firstHeroButton.label,
+    );
+
+    if (firstHeroButton.linkType === "external") {
+      html = setAttributeById(html, "nav-cta-link", "target", "_blank");
+      html = setAttributeById(html, "nav-cta-link", "rel", "noopener noreferrer");
+    }
+  }
 
   html = setHiddenById(html, "top", content.hero?.enabled === false);
 
@@ -1342,13 +1402,7 @@ function renderPage(content) {
   html = setHiddenById(
     html,
     "nav-cta-link",
-    !contactVisible || !hasText(content.hero?.primaryCtaLabel),
-  );
-
-  html = setHiddenById(
-    html,
-    "hero-primary-cta",
-    !contactVisible || !hasText(content.hero?.primaryCtaLabel),
+    heroButtons.length === 0,
   );
 
   /* Opening hours */

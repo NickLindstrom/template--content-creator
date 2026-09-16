@@ -208,6 +208,18 @@ a {
   color: var(--editorial-accent-soft);
 }
 
+.editorial-button--ghost {
+  border: 1px solid color-mix(in srgb, var(--editorial-accent) 46%, var(--editorial-border));
+  background: transparent;
+  color: var(--editorial-accent);
+}
+
+.editorial-button--secondary-ghost {
+  border: 1px solid color-mix(in srgb, var(--editorial-accent-soft) 46%, var(--editorial-border));
+  background: transparent;
+  color: var(--editorial-accent-soft);
+}
+
 .editorial-hero__visual-stage,
 .editorial-contact__card,
 .service-card,

@@ -425,6 +425,25 @@ img {
   transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
 }
 
+.showcase-button--secondary {
+  border-color: var(--color-secondary);
+  background: color-mix(in srgb, var(--color-secondary) 12%, rgba(7, 5, 3, 0.84));
+  color: var(--color-secondary);
+}
+
+.showcase-button--ghost {
+  background: transparent;
+  color: var(--accent-strong);
+  box-shadow: none;
+}
+
+.showcase-button--secondary-ghost {
+  border-color: var(--color-secondary);
+  background: transparent;
+  color: var(--color-secondary);
+  box-shadow: none;
+}
+
 .showcase-button:hover,
 .showcase-button:focus-visible {
   transform: translateY(-2px);
