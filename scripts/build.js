@@ -887,32 +887,33 @@ function buildJsonLd(content, pageUrl) {
     ),
   );
 
-  const openingHoursSpecification = openingHours.alwaysOpen === true
-    ? Object.values(schemaDayNames).map((dayOfWeek) => ({
-        "@type": "OpeningHoursSpecification",
-        dayOfWeek,
-        opens: "00:00",
-        closes: "23:59",
-      }))
-    : Array.isArray(openingHours.days)
-      ? openingHours.days
-          .filter(
-            (item) =>
-              item &&
-              item.closed !== true &&
-              hasText(item.opens) &&
-              hasText(item.closes),
-          )
-          .map((item) => ({
-            "@type": "OpeningHoursSpecification",
+  const openingHoursSpecification =
+    openingHours.alwaysOpen === true
+      ? Object.values(schemaDayNames).map((dayOfWeek) => ({
+          "@type": "OpeningHoursSpecification",
+          dayOfWeek,
+          opens: "00:00",
+          closes: "23:59",
+        }))
+      : Array.isArray(openingHours.days)
+        ? openingHours.days
+            .filter(
+              (item) =>
+                item &&
+                item.closed !== true &&
+                hasText(item.opens) &&
+                hasText(item.closes),
+            )
+            .map((item) => ({
+              "@type": "OpeningHoursSpecification",
 
-            dayOfWeek: schemaDayNames[item.day] || item.day,
+              dayOfWeek: schemaDayNames[item.day] || item.day,
 
-            opens: item.opens,
+              opens: item.opens,
 
-            closes: item.closes,
-          }))
-      : [];
+              closes: item.closes,
+            }))
+        : [];
 
   const businessType = hasText(site.schemaType)
     ? site.schemaType
@@ -940,7 +941,9 @@ function buildJsonLd(content, pageUrl) {
 
       legalName: site.companyName || footer.companyName,
 
-      taxID: hasText(site.organizationNumber) ? site.organizationNumber : undefined,
+      taxID: hasText(site.organizationNumber)
+        ? site.organizationNumber
+        : undefined,
 
       url: /^https?:\/\//i.test(pageUrl) ? pageUrl : undefined,
 
@@ -958,7 +961,8 @@ function buildJsonLd(content, pageUrl) {
 
       sameAs,
 
-      openingHours: openingHours.alwaysOpen === true ? "Mo-Su 00:00-23:59" : undefined,
+      openingHours:
+        openingHours.alwaysOpen === true ? "Mo-Su 00:00-23:59" : undefined,
 
       openingHoursSpecification,
 
@@ -1355,24 +1359,18 @@ function renderPage(content) {
     ? openingHours.days
     : [];
 
-  const openingHoursHtml = openingHours.alwaysOpen === true
-    ? '<div class="opening-hours-row"><span class="opening-hours-row__day">Öppettider</span><span class="opening-hours-row__time">Alltid öppet</span></div>'
-    : renderOpeningHoursDays(openingHourDays);
+  const openingHoursHtml =
+    openingHours.alwaysOpen === true
+      ? '<div class="opening-hours-row"><span class="opening-hours-row__day">Öppettider</span><span class="opening-hours-row__time">Alltid öppet</span></div>'
+      : renderOpeningHoursDays(openingHourDays);
 
   const openingHoursVisible =
-    openingHours.enabled !== false && (openingHours.alwaysOpen === true || hasText(openingHoursHtml));
+    openingHours.enabled !== false &&
+    (openingHours.alwaysOpen === true || hasText(openingHoursHtml));
 
-  html = setText(
-    html,
-    "opening-hours-eyebrow",
-    openingHours.eyebrow || "Öppettider",
-  );
+  html = setText(html, "opening-hours-eyebrow", openingHours.eyebrow || "");
 
-  html = setText(
-    html,
-    "opening-hours-heading",
-    openingHours.heading || "Öppettider",
-  );
+  html = setText(html, "opening-hours-heading", openingHours.heading || "");
 
   html = setText(html, "opening-hours-body", openingHours.body || "");
 
