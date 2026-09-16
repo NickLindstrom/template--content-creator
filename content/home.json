@@ -124,6 +124,7 @@
   },
   "media": {
     "logoUrl": null,
+    "faviconUrl": null,
     "headerLogoOnly": false,
     "logoWidth": "42px",
     "imageRatio": "4 / 3",

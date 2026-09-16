@@ -457,6 +457,22 @@ function setTitle(html, title) {
   );
 }
 
+function getFaviconMimeType(value) {
+  const pathname = String(value || "").split(/[?#]/, 1)[0].toLowerCase();
+
+  if (pathname.endsWith(".svg")) return "image/svg+xml";
+  if (pathname.endsWith(".ico")) return "image/x-icon";
+  if (pathname.endsWith(".jpg") || pathname.endsWith(".jpeg")) return "image/jpeg";
+  if (pathname.endsWith(".webp")) return "image/webp";
+  return "image/png";
+}
+
+function applyFavicon(html, content) {
+  const href = content.media?.faviconUrl || "assets/sajt24-favicon.svg";
+  html = setAttributeById(html, "site-favicon", "href", href);
+  return setAttributeById(html, "site-favicon", "type", getFaviconMimeType(href));
+}
+
 function upsertHeadLink(html, rel, href) {
   if (!hasText(href)) {
     return html;
@@ -1180,6 +1196,8 @@ function renderPage(content) {
   /* SEO + structured data */
 
   html = applySeo(html, content, pageUrl);
+
+  html = applyFavicon(html, content);
 
   html = upsertJsonLd(html, jsonLdBody);
 
