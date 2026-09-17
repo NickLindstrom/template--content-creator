@@ -852,6 +852,22 @@ function renderOpeningHoursDays(days = []) {
     .join("");
 }
 
+function hasConfiguredOpeningHours(openingHours = {}) {
+  if (openingHours.alwaysOpen === true) {
+    return true;
+  }
+
+  const days = Array.isArray(openingHours.days) ? openingHours.days : [];
+
+  return days.some(
+    (item) => item && (hasText(item.opens) || hasText(item.closes)),
+  );
+}
+
+function isOpeningHoursVisible(openingHours = {}) {
+  return openingHours.enabled !== false && hasConfiguredOpeningHours(openingHours);
+}
+
 /* -------------------------------------------------------------------------- */
 /* SEO                                                                        */
 /* -------------------------------------------------------------------------- */
@@ -916,6 +932,8 @@ function buildJsonLd(content, pageUrl) {
 
   const openingHours = content.openingHours || {};
 
+  const openingHoursVisible = isOpeningHoursVisible(openingHours);
+
   const schemaDayNames = {
     Måndag: "Monday",
     Tisdag: "Tuesday",
@@ -958,8 +976,9 @@ function buildJsonLd(content, pageUrl) {
     ),
   );
 
-  const openingHoursSpecification =
-    openingHours.alwaysOpen === true
+  const openingHoursSpecification = !openingHoursVisible
+    ? []
+    : openingHours.alwaysOpen === true
       ? Object.values(schemaDayNames).map((dayOfWeek) => ({
           "@type": "OpeningHoursSpecification",
           dayOfWeek,
@@ -1033,7 +1052,9 @@ function buildJsonLd(content, pageUrl) {
       sameAs,
 
       openingHours:
-        openingHours.alwaysOpen === true ? "Mo-Su 00:00-23:59" : undefined,
+        openingHoursVisible && openingHours.alwaysOpen === true
+          ? "Mo-Su 00:00-23:59"
+          : undefined,
 
       openingHoursSpecification,
 
@@ -1415,6 +1436,24 @@ function renderPage(content) {
 
   html = setText(html, "contact-address", content.contact?.address || "");
 
+  html = setHiddenById(
+    html,
+    "contact-phone-row",
+    !hasText(content.contact?.phone),
+  );
+
+  html = setHiddenById(
+    html,
+    "contact-email-row",
+    !hasText(content.contact?.email),
+  );
+
+  html = setHiddenById(
+    html,
+    "contact-address-row",
+    !hasText(content.contact?.address),
+  );
+
   html = setHiddenById(html, "contact", !contactVisible);
 
   html = setHiddenById(
@@ -1436,9 +1475,7 @@ function renderPage(content) {
       ? '<div class="opening-hours-row"><span class="opening-hours-row__day">Öppettider</span><span class="opening-hours-row__time">Alltid öppet</span></div>'
       : renderOpeningHoursDays(openingHourDays);
 
-  const openingHoursVisible =
-    openingHours.enabled !== false &&
-    (openingHours.alwaysOpen === true || hasText(openingHoursHtml));
+  const openingHoursVisible = isOpeningHoursVisible(openingHours);
 
   html = setText(html, "opening-hours-eyebrow", openingHours.eyebrow || "");
 
